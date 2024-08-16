@@ -1,18 +1,30 @@
-import React, { useState, ChangeEvent } from 'react';
-import Logo from '@/assets/Roux3.png';
-import { useNavigate } from 'react-router-dom';
-
+import React, { useState, useEffect, ChangeEvent } from 'react';
+import Logo from '@/assets/logo.jpeg';
+import { Link, useNavigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react'; // Importando o ícone de loading
 import { ProdutoEstoque } from '@/@types/Produtos';
 import { CriarProduto } from '@/services/Produtos';
 import { uploadImagesToFirebase } from '@/utils/upload';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { GetCategorias } from '@/services/Categorias'; // Importe a função GetCategorias
+import { CategoriasType } from '@/@types/Categorias';
+import { GetFornecedores } from '@/services/Forncedores';
+import { FornecedorType } from '@/@types/Fornecedor';
+
+interface GetCategoriasResponse {
+    items: CategoriasType[];
+}
 
 const NovoProduto: React.FC = () => {
     const navigate = useNavigate();
     const [nomeProduto, setNomeProduto] = useState('');
     const [categoria, setCategoria] = useState('');
     const [novaCategoria, setNovaCategoria] = useState('');
+    const [custo, setCusto] = useState('');
     const [preco, setPreco] = useState('');
+    const [fornecedor, setFornecedor] = useState('');
+    const [fornecedores, setFornecedores] = useState<FornecedorType[]>([]);
     const [quantidade, setQuantidade] = useState('');
     const [informacoesAdicionais, setInformacoesAdicionais] = useState('');
     const [imagens, setImagens] = useState<File[]>([]);
@@ -20,6 +32,28 @@ const NovoProduto: React.FC = () => {
     const [etapa, setEtapa] = useState(1);
     const [modalAberto, setModalAberto] = useState(false);
     const [_imagensCarregadas, setImagensCarregadas] = useState<boolean>(false);
+    const [categorias, setCategorias] = useState<CategoriasType[]>([]);
+
+    useEffect(() => {
+        const fetchCategorias = async () => {
+            try {
+                const response: GetCategoriasResponse = await GetCategorias();
+                const responseFornecedores = await GetFornecedores();
+                console.log('responseFornecedores:', responseFornecedores?.items);
+                if(response){
+                    setCategorias(response.items);
+                }
+
+                if(responseFornecedores){
+                    setFornecedores(responseFornecedores.items);
+                }
+            } catch (error) {
+                console.error('Erro ao buscar categorias:', error);
+            }
+        };
+
+        fetchCategorias();
+    }, []);
 
     const formatarPreco = (value: string) => {
         const numero = Number(value.replace(/[^0-9]/g, '')) / 100;
@@ -35,12 +69,10 @@ const NovoProduto: React.FC = () => {
             for (const file of novosArquivos) {
                 novosURLs.push({ file, url: '', loading: true });
     
-                // Atualiza o estado com a nova imagem e status de carregamento
                 setImagensURLs(prev => [...prev, { file, url: '', loading: true }]);
     
                 try {
                     const url = await uploadImagesToFirebase([file]);
-                    // Atualiza o estado para definir a URL da imagem e parar o carregamento
                     setImagensURLs(prev => 
                         prev.map(img =>
                             img.file === file ? { ...img, url: url[0], loading: false } : img
@@ -49,7 +81,6 @@ const NovoProduto: React.FC = () => {
                 } catch (error) {
                     console.error('Erro ao fazer upload da imagem:', error);
                     carregamentoConcluido = false;
-                    // Para o carregamento se ocorrer um erro
                     setImagensURLs(prev => 
                         prev.map(img =>
                             img.file === file ? { ...img, loading: false } : img
@@ -58,15 +89,12 @@ const NovoProduto: React.FC = () => {
                 }
             }
     
-            // Adiciona os arquivos ao estado de imagens
             setImagens([...imagens, ...novosArquivos]);
     
-            // Verifica se todas as imagens foram carregadas
             const todasImagensCarregadas = !imagensURLs.some(img => img.loading);
             setImagensCarregadas(todasImagensCarregadas && carregamentoConcluido);
         }
     };
-    
     
     const handleAvancar = async () => {
         if (etapa === 1) {
@@ -82,7 +110,7 @@ const NovoProduto: React.FC = () => {
                 const produto: ProdutoEstoque = {
                     nome: nomeProduto,
                     categoria: categoria || novaCategoria,
-                    custo: preco, // Certifique-se de que está correto
+                    custo: custo, // Certifique-se de que está correto
                     preco: preco, // Certifique-se de que está correto
                     quantidade: parseInt(quantidade, 10), // Converta para número
                     informacoes: informacoesAdicionais,
@@ -93,7 +121,6 @@ const NovoProduto: React.FC = () => {
     
                 console.log('Salvar no Firebase:', produto);
     
-                // Criar o produto
                 const resultado = await CriarProduto(produto);
                 if (resultado) {
                     setTimeout(() => {
@@ -110,23 +137,33 @@ const NovoProduto: React.FC = () => {
         }
     };
     
-    
-
     const handleVoltar = () => {
         setEtapa(1);
     };
 
-    const todosCamposPreenchidos = nomeProduto && (categoria || novaCategoria) && preco && quantidade && informacoesAdicionais;
+    const todosCamposPreenchidos = nomeProduto && (categoria || novaCategoria) && preco && quantidade;
+ // Função para converter valores formatados para números
+ const toNumber = (value: string) => {
+    const numero = Number(value.replace(/[^0-9]/g, '')) / 100;
+    return isNaN(numero) ? 0 : numero;
+};
 
+const custoNum = toNumber(custo);
+const precoNum = toNumber(preco);
+
+const lucro = (precoNum - custoNum).toFixed(2);
     return (
-        <div className="w-full flex flex-col">
-            <img src={Logo} className='pb-1' />
+        <div className="w-full flex flex-col tracking-tighter">
+            <Link to="/">
+                <img src={Logo} className='pb-1' alt="Logo" />
+            </Link>
 
             {etapa === 1 && (
                 <div className='w-[95%] flex flex-col items-center justify-center mx-auto space-y-4'>
-                    <input
+                    <Input
                         placeholder='Nome do produto'
                         value={nomeProduto}
+                        className='my-1'
                         onChange={(e) => setNomeProduto(e.target.value)}
                     />
                     <div className="flex w-full space-x-2">
@@ -134,21 +171,52 @@ const NovoProduto: React.FC = () => {
                             name="categoria"
                             className="flex-1 p-2 border rounded"
                             value={categoria}
-                            onChange={(e) => setCategoria(e.target.value)}
-                        >
+                            onChange={(e) => setCategoria(e.target.value)}>
                             <option value="">Selecione uma categoria</option>
-                            <option value="Categoria 1">Categoria 1</option>
-                            <option value="Categoria 2">Categoria 2</option>
+                            {categorias.map(cat => (
+                                <option key={cat.id} value={cat.nome}>{cat.nome}</option>
+                            ))}
                         </select>
-                        <button  onClick={() => setModalAberto(true)}>Nova Categoria</button>
+                        <Button onClick={() => setModalAberto(true)}>Nova Categoria</Button>
                     </div>
-                    <input
-                        placeholder='Preço'
+
+                    <div className="flex w-full space-x-2">
+                    <select
+                            name="fornecedor"
+                            className="flex-1 p-2 border rounded"
+                            value={fornecedor}
+                            onChange={(e) => setFornecedor(e.target.value)}>
+                            <option value="">Selecione um fornecedor</option>
+                            {fornecedores.map(fornecedor => (
+                                <option key={fornecedor.id} value={fornecedor.nome}>{fornecedor.nome}</option>
+                            ))}
+                        </select>
+
+
+                        <Button onClick={() => setModalAberto(true)}>Novo Fornecedor</Button>
+                    </div>
+
+                    <div className='flex items-center justify-between'>
+                    <Input
+                        placeholder='Custo'
                         type='text'
+                        className='w-1/2 mr-2'
+                        value={custo}
+                        onChange={(e) => setCusto(formatarPreco(e.target.value))}/>
+
+                    <Input
+                        placeholder='Venda'
+                        type='text'
+                         className='w-1/2 mr-2'
                         value={preco}
-                        onChange={(e) => setPreco(formatarPreco(e.target.value))}
-                    />
-                    <input
+                        onChange={(e) => setPreco(formatarPreco(e.target.value))} />
+
+
+<span>Lucro: {formatarPreco(lucro)}</span>
+
+                    </div>
+                    
+                    <Input
                         placeholder='Quantidade'
                         type="number"
                         value={quantidade}
@@ -160,13 +228,10 @@ const NovoProduto: React.FC = () => {
                         value={informacoesAdicionais}
                         onChange={(e) => setInformacoesAdicionais(e.target.value)}
                     />
-                    <button
-                        
-                        onClick={handleAvancar}
-                        disabled={!todosCamposPreenchidos}
-                    >
+                    <Button variant="destructive" onClick={handleAvancar}
+                        disabled={!todosCamposPreenchidos}>
                         Avançar
-                    </button>
+                    </Button>
                 </div>
             )}
 
@@ -184,54 +249,50 @@ const NovoProduto: React.FC = () => {
                         Adicionar Imagens (até 5)
                     </label>
                     <div className="grid grid-cols-3 gap-2">
-                    {imagensURLs.map((img, idx) => (
-    <div key={idx} className="relative w-24 h-24">
-        {img.loading && (
-            <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75">
-                <Loader2 className="animate-spin" />
-            </div>
-        )}
-        <img
-            src={img.url || URL.createObjectURL(img.file)}
-            alt={`Preview ${idx + 1}`}
-            className="object-cover w-full h-full"
-        />
-    </div>
-))}
-
+                        {imagensURLs.map((img, idx) => (
+                            <div key={idx} className="relative w-24 h-24">
+                                {img.loading && (
+                                    <div className="absolute inset-0 flex items-center justify-center bg-white bg-opacity-75">
+                                        <Loader2 className="animate-spin" />
+                                    </div>
+                                )}
+                                <img
+                                    src={img.url || URL.createObjectURL(img.file)}
+                                    alt={`Preview ${idx + 1}`}
+                                    className="object-cover w-full h-full"
+                                />
+                            </div>
+                        ))}
                     </div>
                     <div className="w-full flex justify-between">
-                        <button  onClick={handleVoltar}>
+                        <Button onClick={handleVoltar}>
                             Voltar
-                        </button>
-                        <button  onClick={handleAvancar}>
+                        </Button>
+                        <Button onClick={handleAvancar}>
                             Finalizar
-                        </button>
+                        </Button>
                     </div>
                 </div>
             )}
 
-            <button
-                
-                onClick={() => window.history.back()}
-                className="absolute w-full bottom-0 left-1/2 transform -translate-x-1/2 rounded-none h-20"
-            >
-                Voltar
-            </button>
 
             {modalAberto && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white p-6 rounded shadow-lg">
-                        <h2 className="text-lg font-bold mb-4">Adicionar Nova Categoria</h2>
-                        <input
-                            placeholder="Nome da nova categoria"
+                    <div className="bg-white p-4 rounded">
+                        <h2>Nova Categoria</h2>
+                        <Input
+                            placeholder='Nome da nova categoria'
                             value={novaCategoria}
                             onChange={(e) => setNovaCategoria(e.target.value)}
                         />
-                        <div className="flex justify-end mt-4 space-x-2">
-                            <button  onClick={() => setModalAberto(false)}>Cancelar</button>
-                            <button  onClick={() => { setCategoria(novaCategoria); setModalAberto(false); }}>Salvar</button>
-                        </div>
+                        <Button onClick={() => {
+                            if (novaCategoria.trim()) {
+                                setCategoria(novaCategoria);
+                                setNovaCategoria('');
+                                setModalAberto(false);
+                            }
+                        }}>Adicionar</Button>
+                        <Button onClick={() => setModalAberto(false)}>Cancelar</Button>
                     </div>
                 </div>
             )}

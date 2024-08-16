@@ -1,63 +1,63 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Logo from '@/assets/logo.jpeg';
-import { AtualizarProduto, GetProdutos } from "@/services/Produtos";
-import { ProdutoEstoque } from "@/@types/Produtos";
-import ModalProdutos from "@/components/ModalEditarProduto";
+import { AtualizarFornecedor, GetFornecedores } from "@/services/Forncedores";
+import { FornecedorType } from "@/@types/Fornecedor";
+import ModalFornecedores from "@/components/ModalEditarFornecedor";
 
-const ListaProdutos = () => {
-    const [produtos, setProdutos] = useState<ProdutoEstoque[]>([]);
+const ListaFornecedores = () => {
+    const [fornecedores, setFornecedores] = useState<FornecedorType[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [selectedProduto, setSelectedProduto] = useState<ProdutoEstoque | null>(null);
+    const [selectedFornecedor, setSelectedFornecedor] = useState<FornecedorType | null>(null);
     const [showModal, setShowModal] = useState(false);
     const [searchTerm, setSearchTerm] = useState<string>('');
 
-    const fetchProdutos = async () => {
+    const fetchClientes = async () => {
         try {
             setLoading(true);
-            const data = await GetProdutos();
+            const data = await GetFornecedores();
             if (data && data.items) {
-                setProdutos(data.items);
+                setFornecedores(data.items);
             }
         } catch (error) {
-            setError('Erro ao buscar produtos. Tente novamente mais tarde.');
-            console.error('Erro ao buscar produtos:', error);
+            setError('Erro ao buscar fornecedores. Tente novamente mais tarde.');
+            console.error('Erro ao buscar fornecedores:', error);
         } finally {
             setLoading(false);
         }
     };
 
-    const handleProdutoClick = (produto: ProdutoEstoque) => {
-        setSelectedProduto(produto);
+    const handleClienteClick = (fornecedor: FornecedorType) => {
+        setSelectedFornecedor(fornecedor);
         setShowModal(true);
     };
 
-    const handleProdutoUpdate = async (updatedProduto: ProdutoEstoque): Promise<{ status: number; message: string }> => {
+    const handleFornecedorUpdate = async (updateFornecedor: FornecedorType): Promise<{ status: number; message: string }> => {
         try {
-            await AtualizarProduto(updatedProduto);
-            setProdutos(prevProdutos => prevProdutos.map(produto => 
-                produto.id === updatedProduto.id ? updatedProduto : produto
+            const response = await AtualizarFornecedor(updateFornecedor);
+            setFornecedores(prevFornecedores => prevFornecedores.map(fornecedor => 
+                fornecedor.id === updateFornecedor.id ? updateFornecedor : fornecedor
             ));
-            return { status: 200, message: 'Produto atualizado com sucesso.' }; // Adicione esta linha
+            return response;
         } catch (error) {
-            console.error('Erro ao atualizar produto:', error);
-            return { status: 500, message: 'Erro ao atualizar produto.' }; // Adicione esta linha
+            console.error('Erro ao atualizar fornecedor:', error);
+            return { status: 500, message: 'Erro ao atualizar fornecedor' };
         } finally {
             setShowModal(false);
         }
     };
-    
 
     useEffect(() => {
-        fetchProdutos();
+        fetchClientes();
     }, []);
 
     // Função para filtrar clientes com base no termo de busca
-    const filteredProdutos = produtos.filter(produto => {
+    const filteredClientes = fornecedores.filter(fornecedor => {
         const normalizedSearchTerm = searchTerm.toLowerCase();
-        const nomeMatch = produto.nome?.toLowerCase().includes(normalizedSearchTerm);
-        return nomeMatch 
+        const nomeMatch = fornecedor.nome?.toLowerCase().includes(normalizedSearchTerm);
+        const celularMatch = fornecedor.celular?.replace(/\D/g, '').includes(normalizedSearchTerm);
+        return nomeMatch || celularMatch;
     });
 
     return (
@@ -83,27 +83,38 @@ const ListaProdutos = () => {
                     {error}
                 </div>
             ) : (
-                <div className="overflow-auto h-[430px] p-1">
+                <div className="overflow-auto h-[500px] p-1">
                     <table className="w-full table-auto border-collapse">
                         <thead>
                             <tr className="bg-gray-100">
                                 <th className="border p-2">Nome</th>
-                                <th className="border p-2">Quantidade</th>
+                                <th className="border w-[115px]">Celular</th>
                                 <th className="border p-2">Ações</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {filteredProdutos.length > 0 ? (
-                                filteredProdutos.map((produto) => (
-                                    <tr key={produto.id} className="hover:bg-gray-200">
-                                        <td className="border p-2">{produto.nome?.substring(0, 20) + '...'}</td>
-                                        <td className={`border p-2 text-center font-bold ${produto.quantidade < 5 ? 'text-red-500' : 'text-black'}`}>
-                                        {produto.quantidade}
+                            {filteredClientes.length > 0 ? (
+                                filteredClientes.map((cliente) => (
+                                    <tr key={cliente.id} className="hover:bg-gray-200">
+                                        <td className="border p-2">{cliente.nome?.substring(0, 13) + '...'}</td>
+                                        <td className="border p-2">
+                                            {cliente.celular ? (
+                                                <a 
+                                                    href={`https://wa.me/${cliente.celular.replace(/\D/g, '')}`}
+                                                    className="text-blue-500 hover:text-blue-700"
+                                                    target="_blank" 
+                                                    rel="noopener noreferrer"
+                                                >
+                                                    {cliente.celular}
+                                                </a>
+                                            ) : (
+                                                <span className="text-gray-500">Número não disponível</span>
+                                            )}
                                         </td>
                                         <td className="border p-2 text-center">
                                             <button
                                                 className="text-blue-500 hover:text-blue-700"
-                                                onClick={() => handleProdutoClick(produto)}
+                                                onClick={() => handleClienteClick(cliente)}
                                             >
                                                 Editar
                                             </button>
@@ -119,11 +130,11 @@ const ListaProdutos = () => {
                     </table>
                 </div>
             )}
-            {showModal && selectedProduto && (
-                <ModalProdutos 
-                    produto={selectedProduto} 
+            {showModal && selectedFornecedor && (
+                <ModalFornecedores 
+                    fornecedor={selectedFornecedor} 
                     onClose={() => setShowModal(false)} 
-                    onSave={handleProdutoUpdate} 
+                    onSave={handleFornecedorUpdate} 
                 />
             )}
             <button
@@ -136,4 +147,4 @@ const ListaProdutos = () => {
     );
 };
 
-export default ListaProdutos;
+export default ListaFornecedores;

@@ -28,7 +28,7 @@ const menuItems: MenuItem[] = [
   { icon: Vendedores, label: 'Vendedores', link: '/vendedores' },
   { icon: Despesas, label: 'Despesas', link: '/despesas' },
   { icon: Vendas, label: 'Todas as Vendas', link: '/vendas' },
-  { icon: Estoque, label: 'Estoque', link: '/estoque' },
+  // { icon: Estoque, label: 'Vendas', link: '/estoque' },
   { icon: Informacoes, label: 'Informações', link: '/informacoes' },
 ];
 

@@ -2,11 +2,15 @@
 import { Loader2 } from 'lucide-react';
 import Execel from '@/assets/xlxs.png';
 import PDF from '@/assets/pdf.png';
-import Lista from '@/assets/lista-de-tarefas.png';
-import Saldo from '@/assets/divida.png';
+import Lista from '@/assets/estoque.png';
 import Logo from '@/assets/logo.jpeg'
+import EmAlta from '@/assets/estoque-pronto.png'
+import EmBaixa from '@/assets/fora-de-estoque.png'
+import Medalha from "@/assets/medalha-de-ouro.png"
+import Valor from "@/assets/bolsa-de-dinheiro.png"
+
 import { useState } from 'react';
-import Adicionar from '@/assets/cliente.png'
+import Adicionar from '@/assets/adicionar-produto.png'
 import InfoClient from '@/assets/infocliente.png';
 import Telefones from '@/assets/chamada-telefonica.png';
 import pdfMake from 'pdfmake/build/pdfmake';
@@ -45,7 +49,7 @@ const formatPhoneNumber = (number: string) => {
     return number;
 };
 
-const Clientes = () => {
+const Produtos = () => {
     const [show, setShow] = useState(false);
     const [cliente, setCliente] = useState({
         nome: '',
@@ -209,7 +213,7 @@ const Clientes = () => {
 
 
     return (
-        <div className="w-full flex flex-col">
+        <div className="w-full flex flex-col capitalize">
             <Link to="/">
                 <img src={Logo} className='pb-1' />
             </Link>
@@ -323,14 +327,14 @@ const Clientes = () => {
             }
 
             <div className="flex flex-wrap justify-between mb-4">
-                <button onClick={showModal}
+                <Link to="/novoproduto"
                     className="flex-1 text-center p-4 rounded mb-2 mr-2 flex flex-col items-center">
                     <img src={Adicionar} className='w-10' />
-                    <span className="mt-2 text-sm tracking-tighter">Adicionar Cliente</span>
-                </button>
-                <Link to="/listaclientes" className="flex-1 text-center p-4 rounded mb-2 mr-2 flex flex-col items-center">
+                    <span className="mt-2 text-sm tracking-tighter">Adicionar Produto</span>
+                </Link>
+                <Link to="/listaprodutos" className="flex-1 text-center p-4 rounded mb-2 mr-2 flex flex-col items-center">
                     <img src={Lista} className='w-10' />
-                    <span className="mt-2 text-sm tracking-tighter">Listar Clientes</span>
+                    <span className="mt-2 text-sm tracking-tighter">Listar Produtos</span>
                 </Link>
                 <button onClick={generatePDF} className="flex-1 text-center p-4 rounded mb-2 flex flex-col items-center">
                     <img src={PDF} className='w-7' />
@@ -339,15 +343,35 @@ const Clientes = () => {
             </div>
 
             <div className="flex flex-wrap justify-between">
-                <button className="flex-1 text-center p-4 rounded mb-2 mr-2 flex flex-col items-center">
-                    <img src={Saldo} className='w-10' />
-                    <span className="mt-2 text-sm tracking-tighter">Saldo Devedor</span>
-                </button>
+                <Link to="/emalta" className="flex-1 text-center p-4 rounded mb-2 mr-2 flex flex-col items-center">
+                    <img src={EmAlta} className='w-10' />
+                    <span className="mt-2 text-sm tracking-tighter">Produtos em alta</span>
+                </Link>
+
+                <Link to="/embaixa" className="flex-1 text-center p-4 rounded mb-2 mr-2 flex flex-col items-center">
+                    <img src={EmBaixa} className='w-10' />
+                    <span className="mt-2 text-sm tracking-tighter">Produtos em baixa</span>
+                </Link>
                 <button  onClick={generateExcel} className="flex-1 text-center p-4 rounded mb-2 mr-2 flex flex-col items-center">
                     <img src={Execel} className='w-10' />
                     <span className="mt-2 text-sm tracking-tighter">Gerar lista Excel</span>
                 </button>
             </div>
+
+            <div className="flex flex-wrap justify-between">
+                <button className="flex-1 text-center p-4 rounded mb-2 mr-2 flex flex-col items-center">
+                    <img src={Medalha} className='w-10' />
+                    <span className="mt-2 text-sm tracking-tighter">Mais vendidos</span>
+                </button>
+
+                <button className="flex-1 text-center p-4 rounded mb-2 mr-2 flex flex-col items-center">
+                    <img src={Valor} className='w-10' />
+                    <span className="mt-2 text-sm tracking-tighter">Valores do estoque</span>
+                </button>
+
+
+            </div>
+
 
             <button className="bg-red-700 text-white p-4 w-full absolute bottom-0 flex items-center justify-center space-x-2"
             onClick={() => window.history.back()}>
@@ -357,4 +381,4 @@ const Clientes = () => {
     );
 };
 
-export default Clientes;
+export default Produtos;
