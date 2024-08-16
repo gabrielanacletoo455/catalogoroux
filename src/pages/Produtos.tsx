@@ -1,7 +1,7 @@
 
 import { Loader2 } from 'lucide-react';
 import Execel from '@/assets/xlxs.png';
-import PDF from '@/assets/pdf.png';
+//import PDF from '@/assets/pdf.png';
 import Lista from '@/assets/estoque.png';
 import Logo from '@/assets/logo.jpeg'
 import EmAlta from '@/assets/estoque-pronto.png'
@@ -13,16 +13,16 @@ import { useState } from 'react';
 import Adicionar from '@/assets/adicionar-produto.png'
 import InfoClient from '@/assets/infocliente.png';
 import Telefones from '@/assets/chamada-telefonica.png';
-import pdfMake from 'pdfmake/build/pdfmake';
-import pdfFonts from 'pdfmake/build/vfs_fonts';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+// import pdfMake from 'pdfmake/build/pdfmake';
+// import pdfFonts from 'pdfmake/build/vfs_fonts';
+// pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import * as XLSX from 'xlsx'; 
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { CriarCliente, GetClientes } from '@/services/Clientes';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import jsPDF from 'jspdf';
+// import jsPDF from 'jspdf';
 
 interface Cliente {
     id: string;
@@ -116,62 +116,62 @@ const Produtos = () => {
     };
 
 
-    const generatePDF = async () => {
-        setLoading(true);
-        try {
-            // Obtenha os dados dos clientes
-            const response = await GetClientes();
-            console.log('response', response);
-            if (response && response.items) {
-                console.log('response.items', response.items);
-                console.log('response', response.items);
-                const items = response.items as Cliente[];  // Assegura que items é do tipo Cliente[]
+    // const generatePDF = async () => {
+    //     setLoading(true);
+    //     try {
+    //         // Obtenha os dados dos clientes
+    //         const response = await GetClientes();
+    //         console.log('response', response);
+    //         if (response && response.items) {
+    //             console.log('response.items', response.items);
+    //             console.log('response', response.items);
+    //             const items = response.items as Cliente[];  // Assegura que items é do tipo Cliente[]
     
-                // Cria um novo documento PDF
-                const doc = new jsPDF();
+    //             // Cria um novo documento PDF
+    //             const doc = new jsPDF();
         
-                // Adiciona o título
-                doc.setFontSize(18);
-                doc.text('Lista de Clientes', 14, 22);
+    //             // Adiciona o título
+    //             doc.setFontSize(18);
+    //             doc.text('Lista de Clientes', 14, 22);
         
-                // Adiciona os dados dos clientes manualmente
-                let y = 30; // Posição inicial Y para a tabela
-                doc.setFontSize(12);
-                doc.text('Nome', 14, y);
-                doc.text('Apelido', 50, y);
-                doc.text('CEP', 90, y);
-                doc.text('Número', 120, y);
-                doc.text('Complemento', 150, y);
-                doc.text('Bairro', 180, y);
-                doc.text('Cidade', 210, y);
-                doc.text('Rua', 240, y);
-                y += 10; // Espaço entre o cabeçalho e a primeira linha de dados
+    //             // Adiciona os dados dos clientes manualmente
+    //             let y = 30; // Posição inicial Y para a tabela
+    //             doc.setFontSize(12);
+    //             doc.text('Nome', 14, y);
+    //             doc.text('Apelido', 50, y);
+    //             doc.text('CEP', 90, y);
+    //             doc.text('Número', 120, y);
+    //             doc.text('Complemento', 150, y);
+    //             doc.text('Bairro', 180, y);
+    //             doc.text('Cidade', 210, y);
+    //             doc.text('Rua', 240, y);
+    //             y += 10; // Espaço entre o cabeçalho e a primeira linha de dados
         
-                // Adiciona cada linha de cliente
-                items.forEach((cliente) => {
-                    console.log('Adicionando cliente:', cliente);
-                    doc.text(cliente.nome, 14, y);
-                    doc.text(cliente.apelido, 50, y);
-                    doc.text(cliente.cep, 90, y);
-                    doc.text(cliente.numero, 120, y);
-                    doc.text(cliente.complemento, 150, y);
-                    doc.text(cliente.bairro, 180, y);
-                    doc.text(cliente.cidade, 210, y);
-                    doc.text(cliente.rua, 240, y);
-                    y += 10; // Move para a próxima linha
-                });
+    //             // Adiciona cada linha de cliente
+    //             items.forEach((cliente) => {
+    //                 console.log('Adicionando cliente:', cliente);
+    //                 doc.text(cliente.nome, 14, y);
+    //                 doc.text(cliente.apelido, 50, y);
+    //                 doc.text(cliente.cep, 90, y);
+    //                 doc.text(cliente.numero, 120, y);
+    //                 doc.text(cliente.complemento, 150, y);
+    //                 doc.text(cliente.bairro, 180, y);
+    //                 doc.text(cliente.cidade, 210, y);
+    //                 doc.text(cliente.rua, 240, y);
+    //                 y += 10; // Move para a próxima linha
+    //             });
         
-                // Salva o PDF
-                doc.save('lista_clientes.pdf');
-            } else {
-                console.error('Resposta da API inválida ou sem clientes.');
-            }
-        } catch (error) {
-            console.error('Erro ao gerar PDF:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
+    //             // Salva o PDF
+    //             doc.save('lista_clientes.pdf');
+    //         } else {
+    //             console.error('Resposta da API inválida ou sem clientes.');
+    //         }
+    //     } catch (error) {
+    //         console.error('Erro ao gerar PDF:', error);
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // };
     
     
 
@@ -336,10 +336,10 @@ const Produtos = () => {
                     <img src={Lista} className='w-10' />
                     <span className="mt-2 text-sm tracking-tighter">Listar Produtos</span>
                 </Link>
-                <button onClick={generatePDF} className="flex-1 text-center p-4 rounded mb-2 flex flex-col items-center">
+                {/* <button onClick={generatePDF} className="flex-1 text-center p-4 rounded mb-2 flex flex-col items-center">
                     <img src={PDF} className='w-7' />
                     <span className="mt-2 text-sm tracking-tighter">Gerar lista PDF</span>
-                </button>
+                </button> */}
             </div>
 
             <div className="flex flex-wrap justify-between">
