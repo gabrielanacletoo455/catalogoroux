@@ -1,8 +1,8 @@
 import Logo from '@/assets/logo.jpeg'
 import { useEffect, useState } from 'react';
-import pdfMake from 'pdfmake/build/pdfmake';
-import pdfFonts from 'pdfmake/build/vfs_fonts';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+// import pdfMake from 'pdfmake/build/pdfmake';
+// import pdfFonts from 'pdfmake/build/vfs_fonts';
+// pdfMake.vfs = pdfFonts.pdfMake.vfs;
 import { Loader2 } from 'lucide-react';
 
 import { Link } from 'react-router-dom';
