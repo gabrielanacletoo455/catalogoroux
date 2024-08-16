@@ -9,9 +9,9 @@ import { useState } from 'react';
 import Adicionar from '@/assets/caminhao-bau.png'
 import InfoClient from '@/assets/infocliente.png';
 import Telefones from '@/assets/chamada-telefonica.png';
-import pdfMake from 'pdfmake/build/pdfmake';
-import pdfFonts from 'pdfmake/build/vfs_fonts';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+// import pdfMake from 'pdfmake/build/pdfmake';
+// import pdfFonts from 'pdfmake/build/vfs_fonts';
+// pdfMake.vfs = pdfFonts.pdfMake.vfs;
 // import * as XLSX from 'xlsx'; 
 import { Link } from 'react-router-dom';
 //import axios from 'axios';
