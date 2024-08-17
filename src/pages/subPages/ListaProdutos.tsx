@@ -4,6 +4,7 @@ import Logo from '@/assets/logo.jpeg';
 import { AtualizarProduto, GetProdutos } from "@/services/Produtos";
 import { ProdutoEstoque } from "@/@types/Produtos";
 import ModalProdutos from "@/components/ModalEditarProduto";
+import { Loader2 } from 'lucide-react';
 
 const ListaProdutos = () => {
     const [produtos, setProdutos] = useState<ProdutoEstoque[]>([]);
@@ -60,6 +61,7 @@ const ListaProdutos = () => {
         return nomeMatch 
     });
 
+
     return (
         <div className="w-full flex flex-col text-xs">
             <Link to="/">
@@ -75,8 +77,8 @@ const ListaProdutos = () => {
                 />
             </div>
             {loading ? (
-                <div className="flex justify-center items-center h-40">
-                    <div className="loader"></div>
+                    <div className='w-full h-screen flex items-center justify-center'>
+                    <Loader2 className='w-10 h-10 animate-spin' />
                 </div>
             ) : error ? (
                 <div className="text-red-500 text-center">
