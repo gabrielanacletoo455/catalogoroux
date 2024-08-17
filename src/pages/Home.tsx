@@ -27,7 +27,7 @@ const menuItems: MenuItem[] = [
   { icon: Receber, label: 'A Receber', link: '/receber' },
   { icon: Vendedores, label: 'Vendedores', link: '/vendedores' },
   { icon: Despesas, label: 'Despesas', link: '/despesas' },
-  { icon: Vendas, label: 'Todas as Vendas', link: '/vendas' },
+  { icon: Vendas, label: 'Vendas', link: '/vendas' },
   // { icon: Estoque, label: 'Vendas', link: '/estoque' },
   { icon: Informacoes, label: 'Informações', link: '/informacoes' },
 ];
@@ -55,10 +55,10 @@ const Home = () => {
          
         </div>
       </div>
-      <button className="bg-red-700 text-white p-4 w-full absolute bottom-0 flex items-center justify-center space-x-2">
+      <Link to="/novavenda" className="bg-red-700 text-white p-4 w-full absolute bottom-0 flex items-center justify-center space-x-2">
         <PlusCircle size={20} />
         <span>Nova Venda</span>
-      </button>
+      </Link>
     </div>
   );
 };
