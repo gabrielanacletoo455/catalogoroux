@@ -14,6 +14,8 @@ import ListaCategorias from './pages/subPages/ListaCategorias'
 import ListaProdutos from './pages/subPages/ListaProdutos'
 import ProdutosEmAlta from './pages/subPages/ProdutosEmAlta'
 import ProdutosEmBaixa from './pages/subPages/ProdutosEmBaixa'
+import Vendedores from './pages/Vendedores'
+import ListaVendedores from './pages/subPages/ListaVendedores'
 
 
 const router = createBrowserRouter([
@@ -35,7 +37,7 @@ const router = createBrowserRouter([
   
   { path: '/receber', element: <Home />},
   
-  { path: '/vendedores', element: <Home />},
+  { path: '/vendedores', element: <Vendedores />},
   { path: '/vendas', element: <Home />},
 
   { path: '/despesas', element: <Home />},
@@ -47,6 +49,7 @@ const router = createBrowserRouter([
   { path: '/listafornecedores', element: <ListaFornecedores />},
   { path: '/listacategorias', element: <ListaCategorias />},
   { path: '/listaprodutos', element: <ListaProdutos />},
+  { path: '/listavendedores', element: <ListaVendedores />},
 
   
 

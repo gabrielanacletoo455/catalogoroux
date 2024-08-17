@@ -1,24 +1,55 @@
-import { ClienteType } from "@/@types/Cliente";
-import { GetClientes, AtualizarCliente, ExcluirCliente } from "@/services/Clientes";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Logo from '@/assets/logo.jpeg';
-import Modal from "@/components/ModalEditarClient";
+import { FornecedorType } from "@/@types/Fornecedor";
+import { AtualizarVendedor, ExcluirVendedor, GetVendedores } from "@/services/Vendedores";
+import { VendedorType } from "@/@types/Vendedores";
+import ModalVendedor from "@/components/ModalEditarVendedor";
+import EditarIcone from '@/assets/editar.png'
+import Lixo from '@/assets/lixo.png'
 import { SenhasType } from "@/@types/Senhas";
 import { GetSenhas } from "@/services/Senhas";
-import EditarIcone from '@/assets/editar.png'
-import Lixo  from '@/assets/lixo.png'
 
 
-const ListaClientes = () => {
-    const [clientes, setClientes] = useState<ClienteType[]>([]);
+const ListaVendedores = () => {
+    const [vendedores, setVendedores] = useState<VendedorType[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [selectedCliente, setSelectedCliente] = useState<ClienteType | null>(null);
+    const [selectedVendedor, setSelectedVendedor] = useState<VendedorType | null>(null);
     const [showModal, setShowModal] = useState(false);
     const [searchTerm, setSearchTerm] = useState<string>('');
     const [_message, setMessage] = useState('');
     const [showError, setShowError] = useState<boolean>(false);
+
+    const fetchClientes = async () => {
+        try {
+            setLoading(true);
+            const data = await GetVendedores();
+            if (data && data.items) {
+                setVendedores(data.items);
+            }
+        } catch (error) {
+            setError('Erro ao buscar fornecedores. Tente novamente mais tarde.');
+            console.error('Erro ao buscar fornecedores:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleClienteClick = (vendedor: VendedorType) => {
+        setSelectedVendedor(vendedor);
+        setShowModal(true);
+    };
+
+
+    const formatPhoneNumber = (phoneNumber: string) => {
+        const cleaned = phoneNumber.replace(/\D/g, '');
+        const match = cleaned.match(/^(\d{2})(\d{5})(\d{4})$/);
+        if (match) {
+            return `(${match[1]}) ${match[2]}-${match[3]}`;
+        }
+        return phoneNumber;
+    };
 
     const fetchSenhas = async (): Promise<SenhasType[]> => {
         try {
@@ -29,22 +60,23 @@ const ListaClientes = () => {
             return [];
         }
     };
-    
-    const handleExcluirCliente = async (clientId: string) => {
+
+
+    const handleExcluirVendedor = async (vendedorId: string) => {
         const senhaDigitada = prompt('Digite a senha para confirmar a exclusão:');
-        
+
         if (senhaDigitada) {
             const senhas = await fetchSenhas();
             const senhaValida = senhas.some(s => s.senha === senhaDigitada);
-    
+
             if (senhaValida) {
                 try {
-                    const response = await ExcluirCliente(clientId);
+                    const response = await ExcluirVendedor(vendedorId);
                     if (response.status === 200) {
                         // Atualiza o estado removendo o produto excluído
-                        setClientes(prevClientes => prevClientes.filter(cliente => cliente.id !== clientId));
+                        setVendedores(prevVendedores => prevVendedores.filter(vendedor => vendedor.id !== vendedorId));
                         setLoading(false);
-                        setMessage(response.message);                    
+                        setMessage(response.message);
                     } else {
                         setError(response.message);
                     }
@@ -57,35 +89,17 @@ const ListaClientes = () => {
             }
         }
     };
-    
-    const fetchClientes = async () => {
-        try {
-            setLoading(true);
-            const data = await GetClientes();
-            if (data && data.items) {
-                setClientes(data.items);
-            }
-        } catch (error) {
-            setError('Erro ao buscar clientes. Tente novamente mais tarde.');
-            console.error('Erro ao buscar clientes:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
 
-    const handleClienteClick = (cliente: ClienteType) => {
-        setSelectedCliente(cliente);
-        setShowModal(true);
-    };
-
-    const handleClienteUpdate = async (updatedCliente: ClienteType) => {
+    const handleVendedorUpdate = async (updateVendedor: FornecedorType): Promise<{ status: number; message: string }> => {
         try {
-            await AtualizarCliente(updatedCliente);
-            setClientes(prevClientes => prevClientes.map(cliente => 
-                cliente.id === updatedCliente.id ? updatedCliente : cliente
+            const response = await AtualizarVendedor(updateVendedor);
+            setVendedores(prevFornecedores => prevFornecedores.map(vendedor =>
+                vendedor.id === updateVendedor.id ? updateVendedor : vendedor
             ));
+            return response;
         } catch (error) {
-            console.error('Erro ao atualizar cliente:', error);
+            console.error('Erro ao atualizar vendedor:', error);
+            return { status: 500, message: 'Erro ao atualizar vendedor' };
         } finally {
             setShowModal(false);
         }
@@ -96,12 +110,11 @@ const ListaClientes = () => {
     }, []);
 
     // Função para filtrar clientes com base no termo de busca
-    const filteredClientes = clientes.filter(cliente => {
+    const filteredClientes = vendedores.filter(vendedor => {
         const normalizedSearchTerm = searchTerm.toLowerCase();
-        const nomeMatch = cliente.nome?.toLowerCase().includes(normalizedSearchTerm);
-        const apelidoMatch = cliente.apelido?.toLowerCase().includes(normalizedSearchTerm);
-        const celularMatch = cliente.celular?.replace(/\D/g, '').includes(normalizedSearchTerm);
-        return nomeMatch || apelidoMatch || celularMatch;
+        const nomeMatch = vendedor.nome?.toLowerCase().includes(normalizedSearchTerm);
+        const celularMatch = vendedor.celular?.replace(/\D/g, '').includes(normalizedSearchTerm);
+        return nomeMatch || celularMatch;
     });
 
     return (
@@ -132,38 +145,39 @@ const ListaClientes = () => {
                         <thead>
                             <tr className="bg-gray-100">
                                 <th className="border p-2">Nome</th>
-                                <th className="border p-2">Apelido</th>
                                 <th className="border w-[115px]">Celular</th>
                                 <th className="border p-2">Ações</th>
                             </tr>
                         </thead>
                         <tbody>
                             {filteredClientes.length > 0 ? (
-                                filteredClientes.map((cliente) => (
-                                    <tr key={cliente.id} className="hover:bg-gray-200">
-                                        <td className="border p-2">{cliente.nome?.substring(0, 13) + '...'}</td>
-                                        <td className="border p-2">{cliente.apelido?.substring(0, 11) + '...'}</td>
+                                filteredClientes.map((vendedor) => (
+                                    <tr key={vendedor.id} className="hover:bg-gray-200">
                                         <td className="border p-2">
-                                            {cliente.celular ? (
-                                                <a 
-                                                    href={`https://wa.me/${cliente.celular.replace(/\D/g, '')}`}
+                                            {vendedor?.nome && vendedor.nome.length > 15
+                                                ? vendedor.nome.substring(0, 15) + '...'
+                                                : vendedor?.nome}
+                                        </td>
+                                        <td className="border p-2">
+                                            {vendedor.celular ? (
+                                                <a
+                                                    href={`https://wa.me/${vendedor.celular.replace(/\D/g, '')}`}
                                                     className="text-blue-500 hover:text-blue-700"
-                                                    target="_blank" 
-                                                    rel="noopener noreferrer">
-                                                    {cliente.celular}
+                                                    target="_blank"
+                                                    rel="noopener noreferrer" >
+                                                    {formatPhoneNumber(vendedor.celular)}
                                                 </a>
                                             ) : (
-                                                <span className="text-gray-500">Não disponível</span>
+                                                <span className="text-gray-500">não disponível</span>
                                             )}
                                         </td>
-                                        <td className="border p-2 text-center flex">
 
-                                        <img src={EditarIcone} className="mr-5 w-6"
-                                                onClick={() => handleClienteClick(cliente)} />
+                                        <td className="border p-2 text-center flex justify-center">
+                                            <img src={EditarIcone} className="mr-5 w-6"
+                                                onClick={() => handleClienteClick(vendedor)} />
 
                                             <img src={Lixo} className="w-6"
-                                        onClick={() => handleExcluirCliente(cliente.id!)}/>
-                                        
+                                                onClick={() => handleExcluirVendedor(vendedor.id!)} />
                                         </td>
                                     </tr>
                                 ))
@@ -177,7 +191,7 @@ const ListaClientes = () => {
                 </div>
             )}
 
-{showError && (
+            {showError && (
                 <div className="fixed inset-0 bg-slate-500 bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
                     <div className="bg-white p-6 rounded shadow-lg w-[90%] text-center">
                         <p className="text-red-500">Senha incorreta. Você não tem permissão para excluir este .</p>
@@ -191,19 +205,23 @@ const ListaClientes = () => {
                 </div>
             )}
 
-            {showModal && selectedCliente && (
-                <Modal 
-                    cliente={selectedCliente} 
-                    onClose={() => setShowModal(false)} 
-                    onSave={handleClienteUpdate}  />
+
+            {showModal && selectedVendedor && (
+                <ModalVendedor
+                    vendedor={selectedVendedor}
+                    onClose={() => setShowModal(false)}
+                    onSave={handleVendedorUpdate}
+                />
             )}
             <button
                 className="bg-red-700 text-white text-base p-4 w-full absolute bottom-0 flex items-center justify-center space-x-2"
-                onClick={() => window.history.back()}>
+                onClick={() => window.history.back()}
+            >
                 Voltar
             </button>
         </div>
     );
 };
 
-export default ListaClientes;
+export default ListaVendedores;
+
