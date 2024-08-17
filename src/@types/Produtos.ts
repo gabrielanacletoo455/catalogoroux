@@ -3,6 +3,7 @@ export interface ProdutoEstoque {
     nome: string;
     categoria: string;
     custo: string;
+    lucro: string;
     preco: string;
     quantidade: number;
     informacoes: string;

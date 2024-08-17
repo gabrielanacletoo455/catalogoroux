@@ -113,8 +113,7 @@ const ListaCategorias = () => {
                                         <td className="border p-2 text-center">
                                             <button
                                                 className="text-red-500 hover:text-red-700"
-                                                onClick={() => handleExcluirCategoria(categoria.id!)}
-                                            >
+                                                onClick={() => handleExcluirCategoria(categoria.id!)}>
                                                 Excluir
                                             </button>
                                         </td>
@@ -146,8 +145,7 @@ const ListaCategorias = () => {
 
             <button
                 className="bg-red-700 text-white text-base p-4 w-full absolute bottom-0 flex items-center justify-center space-x-2"
-                onClick={() => window.history.back()}
-            >
+                onClick={() => window.history.back()} >
                 Voltar
             </button>
         </div>

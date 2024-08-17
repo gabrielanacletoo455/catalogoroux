@@ -14,7 +14,9 @@ const ModalProdutos: React.FC<ModalProps> = ({ produto, onClose, onSave }) => {
     const [quantidade, setQuantidade] = useState(produto.quantidade);
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState('');
+    
 
+    
     const handleSave = async () => {
         setLoading(true);
         setMessage('');
@@ -54,7 +56,7 @@ const ModalProdutos: React.FC<ModalProps> = ({ produto, onClose, onSave }) => {
                     </div>
 
                     <div className="mb-2">
-                        <label className="block text-sm font-medium">Email</label>
+                        <label className="block text-sm font-medium">Quantidade</label>
                         <input
                             type="number"
                             className="border p-1 w-full"
@@ -63,15 +65,12 @@ const ModalProdutos: React.FC<ModalProps> = ({ produto, onClose, onSave }) => {
                         />
                     </div>
 
-                
-
                     <div className="flex justify-between">
                         <Button
                             type="button"
                             variant="default"
                             className="px-4 py-2 mr-2 rounded"
-                            onClick={onClose}
-                        >
+                            onClick={onClose}>
                             Cancelar
                         </Button>
 
@@ -79,12 +78,10 @@ const ModalProdutos: React.FC<ModalProps> = ({ produto, onClose, onSave }) => {
                             type="button"
                             className="bg-red-700 text-white px-4 py-2 rounded"
                             disabled={loading}
-                            onClick={handleSave}
-                        >
+                            onClick={handleSave} >
                             {loading ? (
                                 <>
                                     <Loader2 className="w-5 h-5 animate-spin" />
-                                    <span className="ml-2">Carregando</span>
                                 </>
                             ) : (
                                 'Salvar'
@@ -94,6 +91,7 @@ const ModalProdutos: React.FC<ModalProps> = ({ produto, onClose, onSave }) => {
                 </form>
                 {message && <div className="mt-2 text-sm text-red-600">{message}</div>}
             </div>
+           
         </div>
     );
 };

@@ -1,10 +1,15 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Logo from '@/assets/logo.jpeg';
-import { AtualizarProduto, GetProdutos } from "@/services/Produtos";
+import { AtualizarProduto, ExcluirProduto, GetProdutos } from "@/services/Produtos";
 import { ProdutoEstoque } from "@/@types/Produtos";
 import ModalProdutos from "@/components/ModalEditarProduto";
 import { Loader2 } from 'lucide-react';
+import { SenhasType } from "@/@types/Senhas";
+import { GetSenhas } from "@/services/Senhas";
+import EditarIcone from '@/assets/editar.png'
+import Lixo  from '@/assets/lixo.png'
+
 
 const ListaProdutos = () => {
     const [produtos, setProdutos] = useState<ProdutoEstoque[]>([]);
@@ -61,7 +66,48 @@ const ListaProdutos = () => {
         return nomeMatch 
     });
 
+    const [_message, setMessage] = useState('');
+    const [showError, setShowError] = useState<boolean>(false);
 
+
+    const fetchSenhas = async (): Promise<SenhasType[]> => {
+        try {
+            const data = await GetSenhas();
+            return data.items || [];
+        } catch (error) {
+            console.error('Erro ao buscar senhas:', error);
+            return [];
+        }
+    };
+    
+    const handleExcluirProduto = async (produtoId: string) => {
+        const senhaDigitada = prompt('Digite a senha para confirmar a exclusão:');
+        
+        if (senhaDigitada) {
+            const senhas = await fetchSenhas();
+            const senhaValida = senhas.some(s => s.senha === senhaDigitada);
+    
+            if (senhaValida) {
+                try {
+                    const response = await ExcluirProduto(produtoId);
+                    if (response.status === 200) {
+                        // Atualiza o estado removendo o produto excluído
+                        setProdutos(prevProdutos => prevProdutos.filter(produto => produto.id !== produtoId));
+                        setLoading(false);
+                        setMessage(response.message);                    
+                    } else {
+                        setError(response.message);
+                    }
+                } catch (error) {
+                    console.error('Erro ao excluir produto:', error);
+                    setError('Erro ao excluir produto. Tente novamente mais tarde.');
+                }
+            } else {
+                setShowError(true);
+            }
+        }
+    };
+    
     return (
         <div className="w-full flex flex-col text-xs">
             <Link to="/">
@@ -102,13 +148,12 @@ const ListaProdutos = () => {
                                         <td className={`border p-2 text-center font-bold ${produto.quantidade < 5 ? 'text-red-500' : 'text-black'}`}>
                                         {produto.quantidade}
                                         </td>
-                                        <td className="border p-2 text-center">
-                                            <button
-                                                className="text-blue-500 hover:text-blue-700"
-                                                onClick={() => handleProdutoClick(produto)}
-                                            >
-                                                Editar
-                                            </button>
+                                        <td className="border p-2 text-center flex">
+                                        <img src={EditarIcone} className="mr-5 w-6"
+                                                onClick={() => handleProdutoClick(produto)}/>
+
+                                        <img src={Lixo} className="w-6"
+                                        onClick={() => handleExcluirProduto(produto.id!)}/>
                                         </td>
                                     </tr>
                                 ))
@@ -128,10 +173,25 @@ const ListaProdutos = () => {
                     onSave={handleProdutoUpdate} 
                 />
             )}
+
+{showError && (
+                <div className="fixed inset-0 bg-slate-500 bg-opacity-50 backdrop-blur-sm flex items-center justify-center z-50">
+                    <div className="bg-white p-6 rounded shadow-lg w-[90%] text-center">
+                        <p className="text-red-500">Senha incorreta. Você não tem permissão para excluir este produto.</p>
+                        <button
+                            className="mt-4 bg-red-700 text-white p-2 rounded"
+                            onClick={() => setShowError(false)}
+                        >
+                            Fechar
+                        </button>
+                    </div>
+                </div>
+            )}
+
+
             <button
                 className="bg-red-700 text-white text-base p-4 w-full absolute bottom-0 flex items-center justify-center space-x-2"
-                onClick={() => window.history.back()}
-            >
+                onClick={() => window.history.back()}>
                 Voltar
             </button>
         </div>

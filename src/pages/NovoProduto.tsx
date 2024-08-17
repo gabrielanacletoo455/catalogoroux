@@ -7,9 +7,9 @@ import { CriarProduto } from '@/services/Produtos';
 import { uploadImagesToFirebase } from '@/utils/upload';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { GetCategorias } from '@/services/Categorias'; // Importe a função GetCategorias
+import { CriarCategoria, GetCategorias } from '@/services/Categorias'; // Importe a função GetCategorias
 import { CategoriasType } from '@/@types/Categorias';
-import { GetFornecedores } from '@/services/Forncedores';
+import { CriarFornecedor, GetFornecedores } from '@/services/Forncedores';
 import { FornecedorType } from '@/@types/Fornecedor';
 
 interface GetCategoriasResponse {
@@ -21,18 +21,26 @@ const NovoProduto: React.FC = () => {
     const [nomeProduto, setNomeProduto] = useState('');
     const [categoria, setCategoria] = useState('');
     const [novaCategoria, setNovaCategoria] = useState('');
+
+
+
     const [custo, setCusto] = useState('');
     const [preco, setPreco] = useState('');
+
     const [fornecedor, setFornecedor] = useState('');
     const [fornecedores, setFornecedores] = useState<FornecedorType[]>([]);
+    const [novoFornecedor, setNovoFornecedor] = useState('');
+    
     const [quantidade, setQuantidade] = useState('');
     const [informacoesAdicionais, setInformacoesAdicionais] = useState('');
     const [imagens, setImagens] = useState<File[]>([]);
     const [imagensURLs, setImagensURLs] = useState<{ file: File; url: string; loading: boolean }[]>([]);
     const [etapa, setEtapa] = useState(1);
     const [modalAberto, setModalAberto] = useState(false);
+    const [modalFornecedorAberto, setmodalFornecedorAberto] = useState(false);
     const [_imagensCarregadas, setImagensCarregadas] = useState<boolean>(false);
     const [categorias, setCategorias] = useState<CategoriasType[]>([]);
+    const [loading, setLoading] = useState(false);
 
     useEffect(() => {
         const fetchCategorias = async () => {
@@ -40,11 +48,11 @@ const NovoProduto: React.FC = () => {
                 const response: GetCategoriasResponse = await GetCategorias();
                 const responseFornecedores = await GetFornecedores();
                 console.log('responseFornecedores:', responseFornecedores?.items);
-                if(response){
+                if (response) {
                     setCategorias(response.items);
                 }
 
-                if(responseFornecedores){
+                if (responseFornecedores) {
                     setFornecedores(responseFornecedores.items);
                 }
             } catch (error) {
@@ -65,15 +73,15 @@ const NovoProduto: React.FC = () => {
             const novosArquivos = Array.from(e.target.files).slice(0, 5 - imagens.length);
             const novosURLs: { file: File; url: string; loading: boolean }[] = [];
             let carregamentoConcluido = true;
-    
+
             for (const file of novosArquivos) {
                 novosURLs.push({ file, url: '', loading: true });
-    
+
                 setImagensURLs(prev => [...prev, { file, url: '', loading: true }]);
-    
+
                 try {
                     const url = await uploadImagesToFirebase([file]);
-                    setImagensURLs(prev => 
+                    setImagensURLs(prev =>
                         prev.map(img =>
                             img.file === file ? { ...img, url: url[0], loading: false } : img
                         )
@@ -81,21 +89,29 @@ const NovoProduto: React.FC = () => {
                 } catch (error) {
                     console.error('Erro ao fazer upload da imagem:', error);
                     carregamentoConcluido = false;
-                    setImagensURLs(prev => 
+                    setImagensURLs(prev =>
                         prev.map(img =>
                             img.file === file ? { ...img, loading: false } : img
                         )
                     );
                 }
             }
-    
+
             setImagens([...imagens, ...novosArquivos]);
-    
+
             const todasImagensCarregadas = !imagensURLs.some(img => img.loading);
             setImagensCarregadas(todasImagensCarregadas && carregamentoConcluido);
         }
     };
-    
+
+    // Atualize o cálculo do lucro
+const calcularLucro = (preco: string, custo: string) => {
+    const custoNum = toNumber(custo);
+    const precoNum = toNumber(preco);
+    return (precoNum - custoNum).toFixed(2);
+};
+
+
     const handleAvancar = async () => {
         if (etapa === 1) {
             setEtapa(2);
@@ -104,12 +120,20 @@ const NovoProduto: React.FC = () => {
                 alert('Todas as imagens devem ser carregadas antes de finalizar.');
                 return;
             }
-    
+            const lucroValorAtualizado = calcularLucro(preco, custo)
+            // Formatar o valor como reais (pt-BR)
+            const formatador = new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL',
+            });
+            
+            const lucroFormatado = formatador.format(parseFloat(lucroValorAtualizado));
             try {
                 const imageURLs = imagensURLs.map(img => img.url).filter(url => url);
                 const produto: ProdutoEstoque = {
                     nome: nomeProduto,
                     categoria: categoria || novaCategoria,
+                    lucro: lucroFormatado,
                     custo: custo, // Certifique-se de que está correto
                     preco: preco, // Certifique-se de que está correto
                     quantidade: parseInt(quantidade, 10), // Converta para número
@@ -118,9 +142,9 @@ const NovoProduto: React.FC = () => {
                     updatedAt: null, // Adicione se necessário
                     imagens: imageURLs, // Adicione aqui
                 };
-    
+
                 console.log('Salvar no Firebase:', produto);
-    
+
                 const resultado = await CriarProduto(produto);
                 if (resultado) {
                     setTimeout(() => {
@@ -136,22 +160,86 @@ const NovoProduto: React.FC = () => {
             }
         }
     };
-    
+
     const handleVoltar = () => {
         setEtapa(1);
     };
 
     const todosCamposPreenchidos = nomeProduto && (categoria || novaCategoria) && preco && quantidade;
- // Função para converter valores formatados para números
- const toNumber = (value: string) => {
-    const numero = Number(value.replace(/[^0-9]/g, '')) / 100;
-    return isNaN(numero) ? 0 : numero;
-};
+    // Função para converter valores formatados para números
+    const toNumber = (value: string) => {
+        const numero = Number(value.replace(/[^0-9]/g, '')) / 100;
+        return isNaN(numero) ? 0 : numero;
+    };
 
-const custoNum = toNumber(custo);
-const precoNum = toNumber(preco);
+    const custoNum = toNumber(custo);
+    const precoNum = toNumber(preco);
 
-const lucro = (precoNum - custoNum).toFixed(2);
+    const lucro = (precoNum - custoNum).toFixed(2);
+
+
+    const handleSaveCategoria = async () => {
+        try {
+            setLoading(true);
+    
+            // Assumindo que CriarCategoria retorna { status: number; result: { id: string; nome: string; } }
+            const response = await CriarCategoria({ nome: novaCategoria });
+    
+            if (response?.status === 201) {
+                const novaCategoriaCriada = response.result; // Acesso correto baseado na estrutura da resposta
+            
+                if (novaCategoriaCriada.nome) { // Verifica se nome não é undefined ou null
+                    setCategoria(novaCategoriaCriada.nome); // Atualiza a categoria selecionada
+                    setCategorias(prevCategorias => [
+                        ...prevCategorias,
+                        novaCategoriaCriada
+                    ]); // Adiciona a nova categoria à lista
+                    setModalAberto(false);
+                } else {
+                    console.error('Nome da nova categoria está indefinido');
+                }
+            }
+             else {
+                console.error('Erro ao criar a categoria:', response);
+            }
+        } catch (error) {
+            console.error('Erro ao criar a categoria:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+    
+
+    const handleSaveFornecedor = async () => {
+        try {
+            setLoading(true);
+    
+            const response = await CriarFornecedor({ nome: novoFornecedor });
+    
+            if (response?.status === 201) {
+                const novaFornecedorCriado = response.result; // Acesso correto baseado na estrutura da resposta
+            
+                if (novaFornecedorCriado.nome) { 
+                    setFornecedor(novaFornecedorCriado.nome); 
+                    setFornecedores(prevFornecedores => [
+                        ...prevFornecedores,
+                        { nome: novoFornecedor } // Create a new FornecedorType object
+                      ]);
+                    setmodalFornecedorAberto(false);
+                } else {
+                    console.error('Nome do novo fornecedor está indefinido');
+                }
+            }
+             else {
+                console.error('Erro ao criar a categoria:', response);
+            }
+        } catch (error) {
+            console.error('Erro ao criar a categoria:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <div className="w-full flex flex-col tracking-tighter">
             <Link to="/">
@@ -181,7 +269,7 @@ const lucro = (precoNum - custoNum).toFixed(2);
                     </div>
 
                     <div className="flex w-full space-x-2">
-                    <select
+                        <select
                             name="fornecedor"
                             className="flex-1 p-2 border rounded"
                             value={fornecedor}
@@ -193,29 +281,29 @@ const lucro = (precoNum - custoNum).toFixed(2);
                         </select>
 
 
-                        <Button onClick={() => setModalAberto(true)}>Novo Fornecedor</Button>
+                        <Button onClick={() => setmodalFornecedorAberto(true)}>Novo Fornecedor</Button>
                     </div>
 
                     <div className='flex items-center justify-between'>
-                    <Input
-                        placeholder='Custo'
-                        type='text'
-                        className='w-1/2 mr-2'
-                        value={custo}
-                        onChange={(e) => setCusto(formatarPreco(e.target.value))}/>
+                        <Input
+                            placeholder='Custo'
+                            type='text'
+                            className='w-1/2 mr-2'
+                            value={custo}
+                            onChange={(e) => setCusto(formatarPreco(e.target.value))} />
 
-                    <Input
-                        placeholder='Venda'
-                        type='text'
-                         className='w-1/2 mr-2'
-                        value={preco}
-                        onChange={(e) => setPreco(formatarPreco(e.target.value))} />
+                        <Input
+                            placeholder='Venda'
+                            type='text'
+                            className='w-1/2 mr-2'
+                            value={preco}
+                            onChange={(e) => setPreco(formatarPreco(e.target.value))} />
 
 
-<span>Lucro: {formatarPreco(lucro)}</span>
+                        <span>Lucro: {formatarPreco(lucro)}</span>
 
                     </div>
-                    
+
                     <Input
                         placeholder='Quantidade'
                         type="number"
@@ -283,16 +371,57 @@ const lucro = (precoNum - custoNum).toFixed(2);
                         <Input
                             placeholder='Nome da nova categoria'
                             value={novaCategoria}
-                            onChange={(e) => setNovaCategoria(e.target.value)}
-                        />
-                        <Button onClick={() => {
-                            if (novaCategoria.trim()) {
-                                setCategoria(novaCategoria);
-                                setNovaCategoria('');
-                                setModalAberto(false);
-                            }
-                        }}>Adicionar</Button>
-                        <Button onClick={() => setModalAberto(false)}>Cancelar</Button>
+                            onChange={(e) => setNovaCategoria(e.target.value)} />
+
+                        <div className='flex items-center justify-between mt-3'>
+                            <Button className='mr-2' onClick={() => setModalAberto(false)}>Cancelar</Button>
+
+
+                            <Button variant="destructive"
+                                onClick={() => {
+                                    if (novaCategoria.trim()) {
+                                        setCategoria(novaCategoria);
+                                        setModalAberto(false);
+                                        handleSaveCategoria();
+                                    }}}>
+                                                 {loading ? (
+                                    <Loader2 className="w-5 h-5 animate-spin" />
+                                ) : (
+                                    'Adicionar'
+                                )}
+                                </Button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+{modalFornecedorAberto && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white p-4 rounded">
+                        <h2>Novo Fornecedor</h2>
+                        <Input
+                            placeholder='Nome do novo fornecedor'
+                            value={novoFornecedor}
+                            onChange={(e) => setNovoFornecedor(e.target.value)} />
+
+                        <div className='flex items-center justify-between mt-3'>
+                            <Button className='mr-2' onClick={() => setmodalFornecedorAberto(false)}>Cancelar</Button>
+
+
+                            <Button variant="destructive"
+                                onClick={() => {
+                                    if (novoFornecedor.trim()) {
+                                        setFornecedor(novoFornecedor);
+                                        setmodalFornecedorAberto(false);
+                                        handleSaveFornecedor();
+                                    }}}>
+                                                 {loading ? (
+                                    <Loader2 className="w-5 h-5 animate-spin" />
+                                ) : (
+                                    'Adicionar'
+                                )}
+                                </Button>
+                        </div>
                     </div>
                 </div>
             )}

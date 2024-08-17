@@ -1,6 +1,6 @@
 import { ClienteType } from "@/@types/Cliente";
 import { db } from "@/firebase/firebase.config";
-import { addDoc, getDocs, collection, updateDoc, doc} from "firebase/firestore";
+import { addDoc, getDocs, collection, updateDoc, doc, deleteDoc} from "firebase/firestore";
 const stockCollectionRef = collection(db, "clientes");
 
 export async function GetClientes() {
@@ -41,5 +41,17 @@ export async function AtualizarCliente(cliente: ClienteType) {
     } catch (error) {
         console.error('Erro ao atualizar o cliente: ', error);
         return { status: 500, message: 'Erro ao atualizar o cliente' };
+    }
+}
+
+
+export async function ExcluirCliente(clienteId: string) {
+    try {
+        const categoriaDocRef = doc(stockCollectionRef, clienteId);
+        await deleteDoc(categoriaDocRef);
+        return { status: 200, message: 'cliente excluído com sucesso!' };
+    } catch (error) {
+        console.error('Erro ao excluir o cliente: ', error);
+        return { status: 500, message: 'Erro ao excluir a cliente' };
     }
 }

@@ -84,8 +84,7 @@ const Catalogo: React.FC = () => {
                         id="categoria"
                         value={categoriaSelecionada}
                         onChange={(e) => setCategoriaSelecionada(e.target.value)}
-                        className="p-2 border rounded-md"
-                    >
+                        className="p-2 border rounded-md">
                         <option value="">Todas as Categorias</option>
                         {categorias.map((categoria) => (
                             <option key={categoria.id} value={categoria.nome}>
@@ -99,7 +98,7 @@ const Catalogo: React.FC = () => {
 
             <div className="grid grid-cols-2 gap-4 p-4">
                 {produtosFiltrados
-                    .filter((produto) => produto.quantidade > 0)
+                    .filter((produto) => produto.quantidade >= 0)
                     .map((produto) => {
                         const fotoPrincipal = (produto.imagens && produto.imagens.length > 0) ? produto.imagens[0] : 'placeholder-image-url';
 

@@ -51,7 +51,7 @@ const Home = () => {
           <Link to="/catalogo" target="_blank" rel="noopener noreferrer" className="flex items-center space-x-2">
             <img src={Catalogo}  className='w-10'/> 
           </Link>
-          <span>Catálogo</span>
+          <span className='underline text-blue-600'>Catálogo</span>
         </div>
       </div>
       <button className="bg-red-700 text-white p-4 w-full absolute bottom-0 flex items-center justify-center space-x-2">
