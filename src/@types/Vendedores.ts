@@ -5,6 +5,7 @@ export interface VendedorType {
     nome?: string;
     apelido?: string;
     cep?: string;
+    emoji?: string;
     senha?: string;
     numero?: string;
     complemento?: string;

@@ -30,6 +30,7 @@ const Vendedores = () => {
         nome: '',
         senha: '',
         celular: '',
+        emoji: '',
     });
     const [loading, setLoading] = useState(false);
 
@@ -86,7 +87,7 @@ const Vendedores = () => {
                             onChange={handleinputChange}
                             className='my-1'
                         />
-                                               <Input
+                            <Input
                             name="senha"
                             placeholder='Senha'
                             value={formatPhoneNumber(vendedor.senha)}
@@ -105,6 +106,15 @@ const Vendedores = () => {
                             onChange={handleinputChange}
                             className='my-2'
                         />
+
+                        <Input
+                            name="emoji"
+                            placeholder='Emoji'
+                            value={vendedor.emoji}
+                            onChange={handleinputChange}
+                            className='my-2'
+                        />
+
                         <div className='w-full flex justify-between'>
                             <Button
                                 onClick={showModal}
