@@ -197,7 +197,7 @@ const NovaVenda = () => {
             };
     
             setLoadingVenda(true);
-    
+            console.log('Nova venda:', novaVenda);
             try {
                 const criarNovaVenda = await CriarVenda(novaVenda);
                 if (criarNovaVenda && criarNovaVenda.status === 201) {

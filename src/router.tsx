@@ -17,6 +17,7 @@ import ProdutosEmBaixa from './pages/subPages/ProdutosEmBaixa'
 import Vendedores from './pages/Vendedores'
 import ListaVendedores from './pages/subPages/ListaVendedores'
 import NovaVenda from './pages/NovaVenda'
+import Vendas from './pages/Vendas'
 
 
 const router = createBrowserRouter([
@@ -39,7 +40,7 @@ const router = createBrowserRouter([
   { path: '/receber', element: <Home />},
   
   { path: '/vendedores', element: <Vendedores />},
-  { path: '/vendas', element: <Home />},
+  { path: '/vendas', element: <Vendas />},
   { path: '/novavenda', element: <NovaVenda />},
 
   { path: '/despesas', element: <Home />},
