@@ -24,6 +24,7 @@ const formatPhoneNumber = (number: string) => {
     return number;
 };
 
+
 const Vendedores = () => {
     const [show, setShow] = useState(false);
     const [vendedor, setVendedores] = useState({

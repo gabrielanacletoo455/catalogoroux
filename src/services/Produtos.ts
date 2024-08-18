@@ -57,3 +57,4 @@ export async function ExcluirProduto(categoriaId: string) {
         return { status: 500, message: 'Erro ao excluir a Produto' };
     }
 }
+

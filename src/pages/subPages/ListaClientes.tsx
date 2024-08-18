@@ -132,7 +132,7 @@ const ListaClientes = () => {
                         <thead>
                             <tr className="bg-gray-100">
                                 <th className="border p-2">Nome</th>
-                                <th className="border p-2">Apelido</th>
+                                {/* <th className="border p-2">Apelido</th> */}
                                 <th className="border w-[115px]">Celular</th>
                                 <th className="border p-2">Ações</th>
                             </tr>
@@ -141,8 +141,8 @@ const ListaClientes = () => {
                             {filteredClientes.length > 0 ? (
                                 filteredClientes.map((cliente) => (
                                     <tr key={cliente.id} className="hover:bg-gray-200">
-                                        <td className="border p-2">{cliente.nome?.substring(0, 13) + '...'}</td>
-                                        <td className="border p-2">{cliente.apelido?.substring(0, 11) + '...'}</td>
+                                        <td className="border p-2">{cliente.nome}</td>
+                                        {/* <td className="border p-2">{cliente.apelido?.substring(0, 11) + '...'}</td> */}
                                         <td className="border p-2">
                                             {cliente.celular ? (
                                                 <a 

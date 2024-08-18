@@ -1,7 +1,7 @@
 import { Loader2, ShoppingCart } from 'lucide-react';
 import Logo from '@/assets/logo.jpeg';
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { GetClientes } from '@/services/Clientes';
@@ -12,6 +12,8 @@ import { VendedorType } from '@/@types/Vendedores';
 import { ProdutoEstoque } from '@/@types/Produtos';
 import { Card } from '@/components/ui/card';
 import Celular from "@/assets/chamada-telefonica.png";
+import { CriarVenda } from '@/services/Vendas';
+import { VendasType } from '@/@types/Vendas';
 
 const NovaVenda = () => {
     const [step, setStep] = useState<number>(1); 
@@ -25,7 +27,36 @@ const NovaVenda = () => {
     const [loading, setLoading] = useState<boolean>(false);
     const [_error, setError] = useState<string | null>(null);
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+    const [totalVenda, setTotalVenda] = useState<number>(0);
+    const [loadingVenda, setLoadingVenda] = useState<boolean>(false);
+    const navigate = useNavigate();
+    const [searchTerm, setSearchTerm] = useState<string>('');
+    const [searchTermClientes, setSearchTermClientes] = useState<string>('');
+
+    const filteredClientes = clientes.filter(cliente => {
+        const normalizedSearchTerm = searchTermClientes.toLowerCase();
+        const nomeMatch = cliente.nome?.toLowerCase().includes(normalizedSearchTerm);
+        const apelidoMatch = cliente.apelido?.toLowerCase().includes(normalizedSearchTerm);
+        const celularMatch = cliente.celular?.replace(/\D/g, '').includes(normalizedSearchTerm);
+        return nomeMatch || apelidoMatch || celularMatch;
+    });
+
+
+    const filteredProduto = produtos.filter(produto => {
+        const normalizedSearchTerm = searchTerm.toLowerCase();
+        const nomeMatch = produto.nome?.toLowerCase().includes(normalizedSearchTerm);
+        return nomeMatch;
+    });
+
+    useEffect(() => {
+        const total = selectedProdutos.reduce((total, { produto, quantidade }) => {
+            const preco = Number(produto.preco.replace('R$', '').replace(',', '.'));
+            return total + (preco * quantidade);
+        }, 0);
     
+        const totalComDesconto = total * (1 - (desconto / 100));
+        setTotalVenda(totalComDesconto);
+    }, [selectedProdutos, desconto]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -59,7 +90,7 @@ const NovaVenda = () => {
             return;
         }
         if (step === 3 && !selectedVendedor) {
-            alert('Por favor, selecione um vendedor.');
+            //alert('Por favor, selecione um vendedor.');
             return;
         }
         setStep((prevStep) => prevStep + 1);
@@ -134,14 +165,62 @@ const NovaVenda = () => {
         return emojis[Math.floor(Math.random() * emojis.length)];
     }
 
-    const handleFinalizarVenda = (): void => {
+    const handleFinalizarVenda = async () => {
         if (verificarEstoque()) {
-            // Lógica para finalizar a venda
-            alert('Venda finalizada com sucesso!');
+            // Verifique se cliente e vendedor não são null
+            if (!selectedCliente || !selectedVendedor) {
+                alert('Cliente ou Vendedor não selecionado.');
+                return;
+            }
+    
+            // Atualize selectedProdutos para incluir precoUnitario e total
+            const produtosComDetalhes = selectedProdutos.map(({ produto, quantidade }) => {
+                const precoUnitario = Number(produto.preco.replace('R$', '').replace(',', '.'));
+                const total = (precoUnitario * quantidade).toFixed(2);
+    
+                return {
+                    produto,
+                    quantidade,
+                    precoUnitario,
+                    total: Number(total), // Total deve ser um número
+                };
+            });
+    
+            // Crie a nova venda
+            const novaVenda: VendasType = {
+                cliente: selectedCliente,
+                vendedor: selectedVendedor,
+                produtos: produtosComDetalhes,
+                desconto,
+                createdAt: new Date().toLocaleDateString('pt-BR'),
+                total: totalVenda,
+            };
+    
+            setLoadingVenda(true);
+    
+            try {
+                const criarNovaVenda = await CriarVenda(novaVenda);
+                if (criarNovaVenda && criarNovaVenda.status === 201) {
+                    setSelectedProdutos([]);
+                    setSelectedVendedor(null);
+                    navigate('/');
+                    alert('Venda finalizada com sucesso!');
+                } else {
+                    // Adicione um tratamento de erro para o caso onde a venda não foi criada
+                    alert('Erro ao finalizar a venda. Tente novamente.');
+                }
+            } catch (error) {
+                console.error('Erro ao finalizar a venda:', error);
+                alert('Ocorreu um erro ao finalizar a venda. Por favor, tente novamente.');
+            } finally {
+                setLoadingVenda(false);
+            }
         } else {
             alert('Não foi possível finalizar a venda devido a problemas com o estoque.');
         }
     };
+    
+    
 
 
     const handleQuantidadeChange = (produtoId: string, novaQuantidade: number) => {
@@ -157,6 +236,7 @@ const NovaVenda = () => {
     const handleRemoverItem = (produtoId: string) => {
         setSelectedProdutos((prev) => prev.filter((item) => item.produto.id !== produtoId));
     };
+
 
 
     return (
@@ -229,8 +309,14 @@ const NovaVenda = () => {
             {step === 1 && (
                 <div className='flex flex-col h-[500px] overflow-auto items-center mx-auto w-[95%]'>
                     <h1 className='tracking-tighter'>Selecione o Cliente</h1>
-                    <Input placeholder='Pesquisar' className="my-3 w-[90%]" />
-                    {clientes.map((cliente) => (
+                    <input
+                    type="text"
+                    placeholder="Buscar por nome ou telefone"
+                    value={searchTermClientes}
+                    onChange={(e) => setSearchTermClientes(e.target.value)}
+                    className="p-2 border border-gray-300 rounded w-full"
+                />
+                    {filteredClientes.map((cliente) => (
                         <Card className='shadow-lg w-[95%] mt-2 h-24 tracking-tighter text-sm p-5'
                             key={cliente.id} onClick={() => {
                                 setSelectedCliente(cliente);
@@ -257,8 +343,15 @@ const NovaVenda = () => {
             {step === 2 && selectedCliente && (
                 <div className='flex flex-col h-[500px] overflow-auto items-center mx-auto w-[95%]'>
                     <h2 className='tracking-tighter'>Selecione o Produto</h2>
-                    <Input placeholder='Pesquisar' className="my-3 w-[90%]" />
-                    {produtos.map((produto) => (
+                    <input
+    type="text"
+    placeholder="Buscar por nome ou telefone"
+    value={searchTerm}
+    onChange={(e) => setSearchTerm(e.target.value)}
+    className="p-2 border border-gray-300 rounded w-full"
+/>
+
+                    {filteredProduto.map((produto) => (
                         <Card className='shadow-lg w-[90%] mt-2 h-[300px] tracking-tighter text-sm p-5'
                             key={produto.id} onClick={() => handleProdutoSelection(produto)}>
                             <div className='flex flex-col'>
@@ -285,21 +378,21 @@ const NovaVenda = () => {
                 vendedores.map((vendedor) => (
                     <div
                         key={vendedor.id}
-                        className='flex flex-col items-center bg-white shadow-lg rounded-lg p-4 w-full'
-                    >
+                        className='flex items-center justify-between bg-white shadow-lg rounded-lg p-4 w-[90% mx-auto]'>
                         <div
                             className='w-12 h-12 flex items-center justify-center rounded-full mb-2'
-                            style={{ backgroundColor: '#f0f0f0' }} // Fundo colorido para o emoji
-                        >
+                            style={{ backgroundColor: '#f0f0f0' }}>
                             <span className='text-2xl'>{vendedor.emoji}</span>
                         </div>
-                        <p className='text-lg font-semibold mb-2'>{vendedor.nome}</p>
-                        <Button
+                        <span className='text-lg font-semibold mb-2'>{vendedor.nome}</span> <br />
+                    <div>
+                    <Button
                             onClick={() => handleVendedorSelection(vendedor)}
-                            className='bg-green-500 text-white rounded-lg py-2 px-4'
-                        >
+                            className='bg-green-500 text-white rounded-lg py-2 px-4'>
                             Selecionar
                         </Button>
+                    </div>
+
                     </div>
                 ))
             ) : (
@@ -310,46 +403,50 @@ const NovaVenda = () => {
 )}
 
 
-            {step === 4 && selectedVendedor && selectedProdutos.length > 0 && (
-                <div className='flex flex-col h-[500px] overflow-auto mx-auto w-[95%]'>
-                    <h2 className='tracking-tighter text-xl'>Relatório da Venda</h2>
-                    <hr />
-                        <div className='flex justify-between'>
-                        <span><b>Cliente:</b> {selectedCliente?.nome}</span> 
-                        <span><b>Vendedor:</b> {selectedVendedor?.nome}</span>
-                        </div>
-                        <hr />
-                    <ul className='h-[300px] mt-2 overflow-auto'>
-                        {selectedProdutos.map(({ produto, quantidade }) => (
-                            <li key={produto.id}>
-                                <p>Produto: {produto.nome}</p>
-                                <p>Quantidade: {quantidade}</p>
-                                <p>Preço Unitário: R${Number(produto.preco.replace('R$', '').replace(',', '.'))}</p>
-                                <p><b>Total:</b> R${Number(produto.preco.replace('R$', '').replace(',', '.')) * quantidade}</p>
-                                <hr />
-                            </li>
-                        ))}
-                    </ul>
-                    <p>Desconto (%): <Input type="number" value={desconto} onChange={(e) => setDesconto(parseInt(e.target.value))} /></p>
-                    <p><b>Total Geral:</b> R${(selectedProdutos.reduce((total, { produto, quantidade }) => {
-                        const preco = Number(produto.preco.replace('R$', '').replace(',', '.')); // Garanta que preco é um número
-                        const quant = Number(quantidade); // Garanta que quantidade é um número
-                        return total + (preco * quant);
-                    }, 0) * (1 - (Number(desconto) / 100))).toFixed(2)}</p>
+{step === 4 && selectedVendedor && selectedProdutos.length > 0 && (
+    <div className="flex flex-col h-[500px] overflow-auto mx-auto w-[95%] bg-white p-4 shadow-md border border-gray-300 rounded-md">
+        <h2 className="tracking-tight text-2xl font-semibold mb-4 text-center">Relatório da Venda</h2>
+        <div className="flex justify-between text-sm mb-2">
+            <span><b>Cliente:</b> {selectedCliente?.nome}</span> 
+            <span><b>Vendedor:</b> {selectedVendedor?.nome}</span>
+        </div>
+        <hr className="border-gray-500 my-2" />
+        <ul className="h-[300px] mt-2 overflow-auto">
+            {selectedProdutos.map(({ produto, quantidade }) => (
+                <li key={produto.id} className="mb-4">
+                    <p className="text-sm"><b>Produto:</b> {produto.nome}</p>
+                    <p className="text-sm"><b>Quantidade:</b> {quantidade}</p>
+                    <p className="text-sm"><b>Preço Unitário:</b> R${Number(produto.preco.replace('R$', '').replace(',', '.'))}</p>
+                    <p className="text-sm"><b>Total:</b> R${(Number(produto.preco.replace('R$', '').replace(',', '.')) * quantidade).toFixed(2)}</p>
+                    <hr className="border-dashed border-gray-400 mt-2" />
+                </li>
+            ))}
+        </ul>
+        <div className="mt-4 text-sm">
+            <p className="mb-2"><b>Desconto (%):</b> 
+                <Input type="number" value={desconto} onChange={(e) => setDesconto(parseInt(e.target.value))} className="ml-2 p-1 border border-gray-300 rounded-md" />
+            </p>
+            <p><b>Total Geral:</b> R${(selectedProdutos.reduce((total, { produto, quantidade }) => {
+                const preco = Number(produto.preco.replace('R$', '').replace(',', '.'));
+                const quant = Number(quantidade);
+                return total + Number((preco * quant).toFixed(2));
+            }, 0) * (1 - (Number(desconto) / 100))).toFixed(2)}</p>
+        </div>
+    </div>
+)}
 
-                </div>
-            )}
 
             <div className='flex justify-between p-4'>
                 {step > 1 && <Button onClick={handlePrevStep}>Voltar</Button>}
                 <Button
-                    onClick={step === 4 ? handleFinalizarVenda : handleNextStep}
-                    disabled={step === 1 && !selectedCliente ||
-                        step === 2 && selectedProdutos.length === 0 ||
-                        step === 3 && !selectedVendedor}
-                >
-                    {step < 4 ? 'Avançar' : 'Finalizar Venda'}
-                </Button>
+    onClick={step === 4 ? handleFinalizarVenda : handleNextStep}
+    disabled={step === 1 && !selectedCliente ||
+        step === 2 && selectedProdutos.length === 0 ||
+        step === 3 && !selectedVendedor ||
+        loadingVenda}>
+    {loadingVenda ? <Loader2 className="animate-spin" /> : (step < 4 ? 'Avançar' : 'Finalizar Venda')}
+</Button>
+
 
             </div>
         </div>
