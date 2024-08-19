@@ -5,6 +5,8 @@ import { Link } from 'react-router-dom';
 import { GetVendas, ExcluirVenda } from '@/services/Vendas';
 import { VendasType } from '@/@types/Vendas';
 import { AtualizarProduto, GetProdutos } from '@/services/Produtos';
+import * as XLSX from 'xlsx';
+import Execel from '@/assets/xlxs.png';
 
 const Vendas = () => {
     const [loading, setLoading] = useState(false);
@@ -38,7 +40,7 @@ const Vendas = () => {
 
     const convertToDate = (dateStr: string): string => {
         if (!dateStr) return '';
-    
+
         // Verifica o formato da data e a converte para o formato yyyy-MM-dd
         if (dateStr.includes('/')) {
             // Formato dd/MM/yyyy
@@ -56,15 +58,15 @@ const Vendas = () => {
             return '';
         }
     };
-    
-    
+
+
     const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const date = event.target.value;
         setSelectedDate(date);
-    
+
         if (date) {
             const selectedDateFormatted = convertToDate(date);
-    
+
             const filtered = vendas.filter(venda => {
                 if (venda.createdAt) {
                     const vendaDateFormatted = convertToDate(venda.createdAt);
@@ -72,15 +74,15 @@ const Vendas = () => {
                 }
                 return false;
             });
-    
+
             setFilteredVendas(filtered);
         } else {
             setFilteredVendas(vendas);
         }
     };
-    
-    
-    
+
+
+
 
     const handleVendaClick = (venda: VendasType) => {
         setSelectedVenda(venda);
@@ -133,21 +135,62 @@ const Vendas = () => {
     }
 
     console.log('vendas', vendas);
+    const generateExcel = async () => {
+        setLoading(true);
+        try {
+            const response = await GetVendas();
+            if (response && response.items) {
+                const items = response.items as VendasType[];
+
+                const worksheetData = [
+                    ['Cliente', 'Nome', 'Produtos', 'Total'],
+                    ...items.map(venda => [
+                        venda.cliente.nome,
+                        venda.vendedor.nome,
+                        venda.produtos.map(produto => `${produto.produto.nome} - ${produto.quantidade} un. (R$ ${produto.total})`).join('\n'),
+                        venda.total,
+
+                    ])
+                ];
+
+                const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, 'Vendas');
+
+                XLSX.writeFile(workbook, 'lista_Vendas.xlsx');
+            } else {
+                console.error('Resposta da API inválida ou sem vendas.');
+            }
+        } catch (error) {
+            console.error('Erro ao gerar Excel:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <div className="w-full flex flex-col text-xs tracking-tighter">
             <Link to="/">
                 <img src={Logo} className='pb-1' alt="Logo" />
             </Link>
 
-        <div className='flex items-center justify-around'>
+            <div className='flex items-center justify-between w-[100%] p-2'>
+                <button onClick={generateExcel} className="text-center flex flex-col items-center">
+                    <img src={Execel} className='w-6 h-6' />
+                    <span className="mt-2 text-sm tracking-tighter">Gerar lista Excel</span>
+                </button>
+
+
+            <div className='flex flex-col'>
             <span>filtrar por data</span>
-        <input
-                type="date"
-                value={selectedDate}
-                onChange={handleDateChange}
-                className="mb-4 p-2 border border-gray-300 rounded"
-            />
-        </div>
+                <input
+                    type="date"
+                    value={selectedDate}
+                    onChange={handleDateChange}
+                    className="mb-4 p-2 border border-gray-300 rounded"
+                />
+            </div>
+            </div>
 
             {filteredVendas.length === 0 ? (
                 <p className="text-center text-gray-500">Nenhuma venda encontrada para a data selecionada.</p>
@@ -188,6 +231,7 @@ const Vendas = () => {
                         <p><strong>Data:</strong> {selectedVenda.createdAt ? new Date(selectedVenda.createdAt).toLocaleDateString() : 'N/A'}</p>
                         <p><strong>Nome do Cliente:</strong> {selectedVenda.cliente?.nome || 'N/A'}</p>
                         <p><strong>Nome do Vendedor:</strong> {selectedVenda.vendedor?.nome || 'N/A'}</p>
+                        <p><strong>Vencimento para:</strong> {selectedVenda.vencimento || 'N/A'}</p>
                         <p><strong>Valor Total:</strong> {selectedVenda.total || 'N/A'}</p>
                         <p><strong>Desconto:</strong> {selectedVenda.desconto || 'N/A'}</p>
                         <h3 className="text-lg font-semibold">Itens:</h3>
@@ -195,13 +239,14 @@ const Vendas = () => {
                             {selectedVenda.produtos.length > 0 ? (
                                 selectedVenda.produtos.map(({ produto, quantidade, precoUnitario, total }, index) => (
                                     <li key={index}>
-                                        {produto?.nome || 'N/A'} - Quantidade: {quantidade || 'N/A'} - Preço Unitário: {precoUnitario || 'N/A'} - Total: {total || 'N/A'}
+                                        {produto?.nome || 'N/A'} <br /> <b>Quantidade:</b> {quantidade || 'N/A'} - <b>Preço Unitário:</b> {precoUnitario || 'N/A'} <br/> <b className=''>Total: {total || 'N/A'}</b>
                                     </li>
                                 ))
                             ) : (
                                 <li>N/A</li>
                             )}
                         </ul>
+                        <b className='text-base tracking-tighter text-red-600'>Total Geral: {selectedVenda.total || 'N/A'}</b>
                         <div>
                             <button
                                 onClick={handleDeleteVenda}

@@ -17,8 +17,10 @@ import { Link } from 'react-router-dom';
 //import axios from 'axios';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { CriarFornecedor } from '@/services/Forncedores';
-// import jsPDF from 'jspdf';
+import { CriarFornecedor, GetFornecedores } from '@/services/Forncedores';
+import Execel from '@/assets/xlxs.png';
+import * as XLSX from 'xlsx'; 
+import { FornecedorType } from '@/@types/Fornecedor';
 
 
 
@@ -76,6 +78,38 @@ const Fornecedores = () => {
         }
     };
 
+
+    const generateExcel = async () => {
+        setLoading(true);
+        try {
+            const response = await GetFornecedores();
+            if (response && response.items) {
+                const items = response.items as FornecedorType[];
+
+                const worksheetData = [
+                    ['Nome', 'Email', 'Telefone', 'Celular'],
+                    ...items.map(fornecedor => [
+                        fornecedor.nome,
+                        fornecedor.email,
+                        fornecedor.telfixo,
+                        fornecedor.celular,
+                    ])
+                ];
+
+                const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, 'Fornecedores');
+
+                XLSX.writeFile(workbook, 'lista_fornecedores.xlsx');
+            } else {
+                console.error('Resposta da API inválida ou sem clientes.');
+            }
+        } catch (error) {
+            console.error('Erro ao gerar Excel:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
 
     return (
@@ -153,10 +187,10 @@ const Fornecedores = () => {
                     <img src={Lista} className='w-10' />
                     <span className="mt-2 text-sm tracking-tighter">Listar fornecedores</span>
                 </Link>
-                {/* <button onClick={generatePDF} className="flex-1 text-center p-4 rounded mb-2 flex flex-col items-center">
-                    <img src={PDF} className='w-7' />
-                    <span className="mt-2 text-sm tracking-tighter">Gerar lista PDF</span>
-                </button> */}
+                <button  onClick={generateExcel} className="flex-1 text-center p-4 rounded mb-2 mr-2 flex flex-col items-center">
+                    <img src={Execel} className='w-10' />
+                    <span className="mt-2 text-sm tracking-tighter">Gerar lista Excel</span>
+                </button>
             </div>
 
             <div className="flex flex-wrap justify-between">

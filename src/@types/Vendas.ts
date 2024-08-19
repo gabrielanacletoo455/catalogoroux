@@ -6,6 +6,7 @@ export interface VendasType {
     id?: string; // Gerado automaticamente pelo banco de dados
     cliente: ClienteType;
     vendedor: VendedorType;
+    vencimento: string;
     produtos: {
         produto: ProdutoEstoque;
         quantidade: number;

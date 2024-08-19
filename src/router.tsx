@@ -18,6 +18,8 @@ import Vendedores from './pages/Vendedores'
 import ListaVendedores from './pages/subPages/ListaVendedores'
 import NovaVenda from './pages/NovaVenda'
 import Vendas from './pages/Vendas'
+import Despesas from './pages/Despesas'
+import ListaDespesas from './pages/subPages/ListaDespesas'
 
 
 const router = createBrowserRouter([
@@ -43,7 +45,7 @@ const router = createBrowserRouter([
   { path: '/vendas', element: <Vendas />},
   { path: '/novavenda', element: <NovaVenda />},
 
-  { path: '/despesas', element: <Home />},
+  { path: '/despesas', element: <Despesas />},
   
   
   { path: '/pedidos', element: <Home />},
@@ -53,6 +55,7 @@ const router = createBrowserRouter([
   { path: '/listacategorias', element: <ListaCategorias />},
   { path: '/listaprodutos', element: <ListaProdutos />},
   { path: '/listavendedores', element: <ListaVendedores />},
+  { path: '/listadespesas', element: <ListaDespesas />},
 
   
 

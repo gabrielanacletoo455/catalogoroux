@@ -32,6 +32,23 @@ const NovaVenda = () => {
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState<string>('');
     const [searchTermClientes, setSearchTermClientes] = useState<string>('');
+    const [vencimento, setVencimento] = useState('');
+
+    const formatarData = (data: string) => {
+        data = data.replace(/\D/g, ""); // Remove todos os caracteres não numéricos
+        if (data.length > 2) data = data.replace(/(\d{2})(\d)/, "$1/$2");
+        if (data.length > 4) data = data.replace(/(\d{2})\/(\d{2})(\d)/, "$1/$2/$3");
+        if (data.length > 8) data = data.substring(0, 10); // Garante que o ano não tenha mais que 4 dígitos
+        return data;
+    };
+    
+    
+    const handleVencimentoChange = (e: { target: { value: string; }; }) => {
+        const formattedDate = formatarData(e.target.value);
+        setVencimento(formattedDate);
+    };
+    
+
 
     const filteredClientes = clientes.filter(cliente => {
         const normalizedSearchTerm = searchTermClientes.toLowerCase();
@@ -191,6 +208,7 @@ const NovaVenda = () => {
                 cliente: selectedCliente,
                 vendedor: selectedVendedor,
                 produtos: produtosComDetalhes,
+                vencimento,
                 desconto,
                 createdAt: new Date().toLocaleDateString('pt-BR'),
                 total: totalVenda,
@@ -404,13 +422,13 @@ const NovaVenda = () => {
 
 
 {step === 4 && selectedVendedor && selectedProdutos.length > 0 && (
-    <div className="flex flex-col h-[500px] overflow-auto mx-auto w-[95%] bg-white p-4 shadow-md border border-gray-300 rounded-md">
+    <div className="flex flex-col h-[500px] overflow-auto mx-auto w-[95%] bg-yellow-100 p-4 shadow-md border border-gray-300 rounded-md">
         <h2 className="tracking-tight text-2xl font-semibold mb-4 text-center">Relatório da Venda</h2>
         <div className="flex justify-between text-sm mb-2">
             <span><b>Cliente:</b> {selectedCliente?.nome}</span> 
             <span><b>Vendedor:</b> {selectedVendedor?.nome}</span>
         </div>
-        <hr className="border-gray-500 my-2" />
+        <hr className="border-dashed border-gray-400 mt-2" />
         <ul className="h-[300px] mt-2 overflow-auto">
             {selectedProdutos.map(({ produto, quantidade }) => (
                 <li key={produto.id} className="mb-4">
@@ -424,8 +442,20 @@ const NovaVenda = () => {
         </ul>
         <div className="mt-4 text-sm">
             <p className="mb-2"><b>Desconto (%):</b> 
-                <Input type="number" value={desconto} onChange={(e) => setDesconto(parseInt(e.target.value))} className="ml-2 p-1 border border-gray-300 rounded-md" />
+                <Input type="number" value={desconto} onChange={(e) => setDesconto(parseInt(e.target.value))} className="p-1 border border-gray-300 rounded-md" />
             </p>
+            <p className="mb-2 mt-4">
+            <b>Vencimento:</b> 
+            <Input 
+                type="text" 
+                value={vencimento} 
+                onChange={handleVencimentoChange} 
+                placeholder="dd/mm/yyyy"
+                className="ml-2 p-1 border border-gray-300 rounded-md"
+                maxLength={10} // Limita o input a 10 caracteres (dd/mm/yyyy)
+            />
+        </p>
+
             <p><b>Total Geral:</b> R${(selectedProdutos.reduce((total, { produto, quantidade }) => {
                 const preco = Number(produto.preco.replace('R$', '').replace(',', '.'));
                 const quant = Number(quantidade);
