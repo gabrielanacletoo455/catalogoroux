@@ -1,15 +1,15 @@
 import { Link } from 'react-router-dom';
-import Clientes from '@/assets/equipe.png'
-import Fornecedores from '@/assets/fornecedor.png'
-import Estoque from '@/assets/caixa.png'
-//import Receber from '@/assets/pagamento-em-dinheiro.png'
-import Categorias from '@/assets/etiqueta-de-preco.png'
-import Vendedores from '@/assets/vendedor.png'
-import Despesas from '@/assets/despesas.png'
-import Vendas from '@/assets/pos-terminal.png'
-import Catalogo from '@/assets/lendo-um-livro.png'
-import Informacoes from '@/assets/definicoes.png'
-import Logo from '@/assets/logo.jpeg'
+import Clientes from '@/assets/equipe.png';
+import Fornecedores from '@/assets/fornecedor.png';
+import Estoque from '@/assets/caixa.png';
+// import Receber from '@/assets/pagamento-em-dinheiro.png';
+import Categorias from '@/assets/etiqueta-de-preco.png';
+import Vendedores from '@/assets/vendedor.png';
+import Despesas from '@/assets/despesas.png';
+import Vendas from '@/assets/pos-terminal.png';
+import Catalogo from '@/assets/lendo-um-livro.png';
+import Informacoes from '@/assets/definicoes.png';
+import Logo from '@/assets/logo.jpeg';
 import { PlusCircle } from 'lucide-react';
 
 // Defina o tipo para o ícone
@@ -34,31 +34,36 @@ const menuItems: MenuItem[] = [
 
 const Home = () => {
   return (
-    <div className="flex flex-col justify-between overflow-hidden tracking-tighter">
-      <img src={Logo} alt="Logo" />
-      <div className="grid grid-cols-3 gap-4 p-4 text-center">
-        {menuItems.map((item, index) => (
-          <Link to={item.link} key={index} className="flex flex-col items-center justify-center my-4">
-            {typeof item.icon === 'string' ? (
-              <img src={item.icon} alt={item.label} className="w-8 h-8" />
-            ) : (
-              <item.icon size={32} />
-            )}
-            <span>{item.label}</span>
-          </Link>
-        ))}
-        <div className="flex flex-col items-center justify-center">
-        <img src={Catalogo}  className='w-10'/> 
-          <Link to="/catalogo" target="_blank" rel="noopener noreferrer" className="flex items-center space-x-2">
-          <span className='underline text-blue-600'>Catálogo</span>
-          </Link>
-         
+    <div className="flex flex-col">
+      <header className="bg-white shadow-md md:p-4 md:hidden">
+        <img src={Logo} alt="Logo" className="mx-auto md:w-32 w-full" />
+      </header>
+      <main className="flex-grow p-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 text-center">
+          {menuItems.map((item, index) => (
+            <Link to={item.link} key={index} className="flex flex-col items-center justify-center p-2">
+              {typeof item.icon === 'string' ? (
+                <img src={item.icon} alt={item.label} className="w-9 h-9 sm:w-16 sm:h-16" />
+              ) : (
+                <item.icon size={32} className="sm:w-16 sm:h-16" />
+              )}
+              <span className="mt-2 text-sm sm:text-base">{item.label}</span>
+            </Link>
+          ))}
+          <div className="flex flex-col items-center justify-center p-2">
+            <img src={Catalogo} alt="Catálogo" className='w-16' />
+            <Link to="/catalogo" target="_blank" rel="noopener noreferrer" className="flex items-center space-x-2 mt-2">
+              <span className='underline text-blue-600 text-sm sm:text-base'>Catálogo</span>
+            </Link>
+          </div>
         </div>
-      </div>
-      <Link to="/novavenda" className="bg-red-700 text-white p-4 w-full absolute bottom-0 flex items-center justify-center space-x-2">
-        <PlusCircle size={20} />
-        <span>Nova Venda</span>
-      </Link>
+      </main>
+      <footer className="bg-red-700 text-white p-4 w-full fixed bottom-0 flex items-center justify-center space-x-2">
+        <Link to="/novavenda" className="flex items-center">
+          <PlusCircle size={20} />
+          <span className="ml-2">Nova Venda</span>
+        </Link>
+      </footer>
     </div>
   );
 };
