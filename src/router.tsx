@@ -20,11 +20,14 @@ import NovaVenda from './pages/NovaVenda'
 import Vendas from './pages/Vendas'
 import Despesas from './pages/Despesas'
 import ListaDespesas from './pages/subPages/ListaDespesas'
+import Carrinho from './pages/Carrinho'
+import ProdutoDetalhe from './pages/subPages/ProdutoDetalhe'
 
 
 const router = createBrowserRouter([
   { path: '/', element: <Home />},
   { path: '/catalogo', element: <Catalogo />},
+  { path: '/produto/:id', element: <ProdutoDetalhe />}, 
 
   { path: '/clientes', element: <Clientes />},
   
@@ -44,6 +47,7 @@ const router = createBrowserRouter([
   { path: '/vendedores', element: <Vendedores />},
   { path: '/vendas', element: <Vendas />},
   { path: '/novavenda', element: <NovaVenda />},
+  { path: '/carrinho', element: <Carrinho />},
 
   { path: '/despesas', element: <Despesas />},
   

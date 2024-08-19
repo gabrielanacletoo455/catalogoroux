@@ -5,6 +5,7 @@ export interface ProdutoEstoque {
     custo: string;
     lucro: string;
     preco: string;
+    descricao?: string;
     quantidade: number;
     informacoes: string;
     createdAt: string | null;

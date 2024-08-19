@@ -153,10 +153,10 @@ produtos.forEach(produto => {
                         <span>R$ {valorTotalEstoque.toFixed(2)}</span> 
                     </div>
          
-                    <div className='flex justify-between items-center w-[100%] mx-auto'>
+                    {/* <div className='flex justify-between items-center w-[100%] mx-auto'>
                         <span>Valor de faturamento</span> 
                         <span>R$ {valorTotalVenda.toFixed(2)}</span> 
-                    </div>
+                    </div> */}
 
                 </CardContent>
             </Card>
