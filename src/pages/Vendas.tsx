@@ -209,7 +209,7 @@ const Vendas = () => {
                             <tr key={venda.id}>
                                 <td className="border p-2">{venda.createdAt}</td>
                                 <td className="border p-2">{venda.cliente?.nome || 'N/A'}</td>
-                                <td className="border p-2">{venda.total || 'N/A'}</td>
+                                <td className="border p-2">{venda.total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) || 'N/A'}</td>
                                 <td className="border p-2">
                                     <button
                                         onClick={() => handleVendaClick(venda)}
