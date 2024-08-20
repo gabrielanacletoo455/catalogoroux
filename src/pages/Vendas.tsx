@@ -228,7 +228,7 @@ const Vendas = () => {
                 <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
                     <div className="bg-white p-4 rounded w-3/4 max-w-3xl">
                         <h2 className="text-xl font-bold">Detalhes da Venda</h2>
-                        <p><strong>Data:</strong> {selectedVenda.createdAt ? new Date(selectedVenda.createdAt).toLocaleDateString() : 'N/A'}</p>
+                        <p><strong>Data:</strong> {selectedVenda.createdAt ? selectedVenda.createdAt : 'N/A'}</p>
                         <p><strong>Nome do Cliente:</strong> {selectedVenda.cliente?.nome || 'N/A'}</p>
                         <p><strong>Nome do Vendedor:</strong> {selectedVenda.vendedor?.nome || 'N/A'}</p>
                         <p><strong>Vencimento para:</strong> {selectedVenda.vencimento || 'N/A'}</p>
