@@ -17,4 +17,5 @@ export interface VendasType {
     updatedAt?: string | null;
     desconto: number;
     total: number;
+    status?: 'pendente' | 'paga' | 'cancelada';
 }
