@@ -22,6 +22,7 @@ import Despesas from './pages/Despesas'
 import ListaDespesas from './pages/subPages/ListaDespesas'
 import Carrinho from './pages/Carrinho'
 import ProdutoDetalhe from './pages/subPages/ProdutoDetalhe'
+import Pesquisa from './pages/Pesquisa'
 
 
 const router = createBrowserRouter([
@@ -36,6 +37,7 @@ const router = createBrowserRouter([
   { path: '/produtos', element: <Produtos />},
   { path: '/emalta', element: <ProdutosEmAlta />},
   { path: '/embaixa', element: <ProdutosEmBaixa />},
+  { path: '/pesquisa', element: <Pesquisa />},
 
   
   { path: '/novoproduto', element: <NovoProduto />},
