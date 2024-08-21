@@ -28,15 +28,18 @@ const scrapeData = async (query: string): Promise<void> => {
     
     // Usa cheerio para fazer parsing do HTML
     const $ = cheerio.load(html);
-    
-    // Seleciona a div com a classe 'listagemProdutos'
-    const listagemProdutosDiv = $('.listagemProdutos');
-    
-    // Conta o número de <li> dentro da div
-    const numberOfItems = listagemProdutosDiv.find('li').length;
-    
-    // Exibe a quantidade de <li> encontrados
-    console.log(`Número de <li> dentro da div 'listagemProdutos': ${numberOfItems}`);
+        
+    // Seletor da div que você deseja verificar
+    const divSelector = 'div.listagemProdutos'; // Substitua pelo seletor apropriado
+
+    // Verifica se a div contém uma ul
+    const hasUl = $(divSelector).find('ul').length > 0;
+
+    if (hasUl) {
+      console.log('A div contém uma ul.');
+    } else {
+      console.log('A div não contém uma ul.');
+    }
     
   } catch (error) {
     console.error('Erro ao buscar ou processar dados:', error);
