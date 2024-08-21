@@ -3,11 +3,12 @@ import { useState } from 'react';
 import scrapeData, { Product } from '@/services/scraping';
 
 const Pesquisa = () => {
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, _setProducts] = useState<Product[]>([]);
   const [query, setQuery] = useState<string>('');
 
   const handleSearch = async () => {
-    const results = await scrapeData(query);
+    const _results = await scrapeData(query);
+    console.log(_results);
     // setProducts(results);
   };
 
