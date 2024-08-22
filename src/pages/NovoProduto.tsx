@@ -176,7 +176,7 @@ const calcularLucro = (preco: string, custo: string) => {
     const precoNum = toNumber(preco);
 
     const lucro = (precoNum - custoNum).toFixed(2);
-
+    const precoSugerido = (custoNum  / 0.6).toFixed(2);
 
     const handleSaveCategoria = async () => {
         try {
@@ -298,24 +298,27 @@ const calcularLucro = (preco: string, custo: string) => {
                             className='w-1/2 mr-2'
                             value={preco}
                             onChange={(e) => setPreco(formatarPreco(e.target.value))} />
-
-
-                        <span>Lucro: {formatarPreco(lucro)}</span>
-
                     </div>
 
-                    <Input
+                        <div className='flex w-full items-center'>
+                        <Input
                         placeholder='Quantidade'
                         type="number"
+                        className='w-32'
                         value={quantidade}
-                        onChange={(e) => setQuantidade(e.target.value)}
-                    />
-                    <textarea
+                        onChange={(e) => setQuantidade(e.target.value)}/>
+
+
+                        <span className='mx-1'>Lucro: {formatarPreco(lucro)}</span>
+                        <span>Preço sugerido: {formatarPreco(precoSugerido)} (40%)</span>
+                        </div> 
+
+                    {/* <textarea
                         placeholder='Informações adicionais'
                         className="p-2 w-full border rounded"
                         value={informacoesAdicionais}
                         onChange={(e) => setInformacoesAdicionais(e.target.value)}
-                    />
+                    /> */}
                     <Button variant="destructive" onClick={handleAvancar}
                         disabled={!todosCamposPreenchidos}>
                         Avançar
