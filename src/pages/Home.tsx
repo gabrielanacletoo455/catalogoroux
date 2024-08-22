@@ -9,7 +9,7 @@ import Despesas from '@/assets/despesas.png';
 import Vendas from '@/assets/pos-terminal.png';
 import Catalogo from '@/assets/lendo-um-livro.png';
 import Informacoes from '@/assets/definicoes.png';
-import Logo from '@/assets/logo.jpeg';
+import Logo from '@/assets/banner.jpeg';
 import { PlusCircle } from 'lucide-react';
 
 // Defina o tipo para o ícone

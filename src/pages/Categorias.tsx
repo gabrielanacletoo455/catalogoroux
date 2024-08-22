@@ -1,6 +1,6 @@
 import { Loader2 } from 'lucide-react';
 import Lista from '@/assets/lista-de-tarefas.png';
-import Logo from '@/assets/logo.jpeg';
+import Logo from '@/assets/banner.jpeg';
 import { useState, useEffect } from 'react';
 import Adicionar from '@/assets/categoriare.png';
 import InfoClient from '@/assets/infocliente.png';

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, ChangeEvent } from 'react';
-import Logo from '@/assets/logo.jpeg';
+import Logo from '@/assets/banner.jpeg';
 import { Link, useNavigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react'; // Importando o ícone de loading
 import { ProdutoEstoque } from '@/@types/Produtos';

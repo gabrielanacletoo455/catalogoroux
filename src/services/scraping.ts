@@ -30,7 +30,7 @@ const scrapeData = async (query: string): Promise<Product[]> => {
       if (site === 'VirtualMake') {
         const ulSelector = 'ul[data-produtos-linha="4"]';
 
-        $(ulSelector).find('li').each((index, element) => {
+        $(ulSelector).find('li').each((_index, element) => {
           const productElement = $(element);
           const title = productElement.find('.info-produto a').text().trim() || '';
           const link = productElement.find('.info-produto a').attr('href')?.trim() || '';
@@ -44,7 +44,7 @@ const scrapeData = async (query: string): Promise<Product[]> => {
       } else if (site === 'IDMDistribuicoes') {
         const ulSelector = '.showcase-catalog .list-product.flex.f-wrap';
 
-        $(ulSelector).find('li.item.flex').each((index, element) => {
+        $(ulSelector).find('li.item.flex').each((_index, element) => {
           const productElement = $(element);
           const title = productElement.find('.image a').attr('title')?.trim() || '';
           const link = productElement.find('.image a').attr('href')?.trim() || '';

@@ -1,7 +1,7 @@
 
 import { Loader2 } from 'lucide-react';
 import Lista from '@/assets/lista-de-tarefas.png';
-import Logo from '@/assets/logo.jpeg'
+import Logo from '@/assets/banner.jpeg';
 import { useState } from 'react';
 import InfoClient from '@/assets/infocliente.png';
 import Telefones from '@/assets/chamada-telefonica.png';

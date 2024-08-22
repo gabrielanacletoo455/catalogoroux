@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
-import Logo from '@/assets/logo.jpeg';
+import Logo from '@/assets/banner.jpeg';
 import { Link } from 'react-router-dom';
 import { GetVendas, ExcluirVenda } from '@/services/Vendas';
 import { VendasType } from '@/@types/Vendas';
 import { AtualizarProduto, GetProdutos } from '@/services/Produtos';
 import * as XLSX from 'xlsx';
 import Execel from '@/assets/xlxs.png';
+import { Input } from '@/components/ui/input';
 
 const Vendas = () => {
     const [loading, setLoading] = useState(false);
@@ -15,6 +16,19 @@ const Vendas = () => {
     const [selectedDate, setSelectedDate] = useState('');
     const [selectedVenda, setSelectedVenda] = useState<VendasType | null>(null);
     const [deleting, setDeleting] = useState(false);
+
+    const formatarData = (data: string) => {
+        data = data.replace(/\D/g, ""); // Remove todos os caracteres não numéricos
+        if (data.length > 2) data = data.replace(/(\d{2})(\d)/, "$1/$2");
+        if (data.length > 4) data = data.replace(/(\d{2})\/(\d{2})(\d)/, "$1/$2/$3");
+        if (data.length > 8) data = data.substring(0, 10); // Garante que o ano não tenha mais que 4 dígitos
+        return data;
+    };
+
+    const handleVencimentoChange = (e: { target: { value: string; }; }) => {
+        const formattedDate = formatarData(e.target.value);
+        setSelectedDate(formattedDate);
+    };
 
     const fetchVendas = async () => {
         try {
@@ -37,52 +51,16 @@ const Vendas = () => {
         fetchVendas();
     }, []);
 
-
-    const convertToDate = (dateStr: string): string => {
-        if (!dateStr) return '';
-
-        // Verifica o formato da data e a converte para o formato yyyy-MM-dd
-        if (dateStr.includes('/')) {
-            // Formato dd/MM/yyyy
-            const [day, month, year] = dateStr.split('/').map(part => parseInt(part, 10));
-            if (isNaN(day) || isNaN(month) || isNaN(year)) {
-                console.error('Data inválida:', dateStr);
-                return '';
-            }
-            return `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
-        } else if (dateStr.includes('-')) {
-            // Formato yyyy-MM-dd
-            return dateStr;
-        } else {
-            console.error('Formato de data desconhecido:', dateStr);
-            return '';
-        }
-    };
-
-
-    const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const date = event.target.value;
-        setSelectedDate(date);
-
-        if (date) {
-            const selectedDateFormatted = convertToDate(date);
-
-            const filtered = vendas.filter(venda => {
-                if (venda.createdAt) {
-                    const vendaDateFormatted = convertToDate(venda.createdAt);
-                    return vendaDateFormatted === selectedDateFormatted;
-                }
-                return false;
-            });
-
-            setFilteredVendas(filtered);
-        } else {
+    useEffect(() => {
+        if (selectedDate.trim() === '') {
             setFilteredVendas(vendas);
+        } else {
+            const filtered = vendas.filter(venda => 
+                venda.createdAt && venda.createdAt.includes(selectedDate)
+            );
+            setFilteredVendas(filtered);
         }
-    };
-
-
-
+    }, [selectedDate, vendas]);
 
     const handleVendaClick = (venda: VendasType) => {
         setSelectedVenda(venda);
@@ -134,7 +112,6 @@ const Vendas = () => {
         );
     }
 
-    console.log('vendas', vendas);
     const generateExcel = async () => {
         setLoading(true);
         try {
@@ -149,7 +126,6 @@ const Vendas = () => {
                         venda.vendedor.nome,
                         venda.produtos.map(produto => `${produto.produto.nome} - ${produto.quantidade} un. (R$ ${produto.total})`).join('\n'),
                         venda.total,
-
                     ])
                 ];
 
@@ -180,16 +156,17 @@ const Vendas = () => {
                     <span className="mt-2 text-sm tracking-tighter">Gerar lista Excel</span>
                 </button>
 
-
-            <div className='flex flex-col'>
-            <span>filtrar por data</span>
-                <input
-                    type="date"
-                    value={selectedDate}
-                    onChange={handleDateChange}
-                    className="mb-4 p-2 border border-gray-300 rounded"
-                />
-            </div>
+                <div className='flex flex-col'>
+                    <span>Filtrar por data</span>
+                    <Input 
+                        type="text" 
+                        value={selectedDate} 
+                        onChange={handleVencimentoChange} 
+                        placeholder="dd/mm/yyyy"
+                        className="ml-2 p-1 border border-gray-300 rounded-md"
+                        maxLength={10} // Limita o input a 10 caracteres (dd/mm/yyyy)
+                    />
+                </div>
             </div>
 
             {filteredVendas.length === 0 ? (
@@ -228,54 +205,41 @@ const Vendas = () => {
                 <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
                     <div className="bg-white p-4 rounded w-3/4 max-w-3xl">
                         <h2 className="text-xl font-bold">Detalhes da Venda</h2>
-                            <div className='flex justify-between items-center'>
-                            <p><strong>Vencimento:</strong> {selectedVenda.vencimento ? selectedVenda.vencimento : 'N/A'}</p>
-                            <p><strong>Status:</strong> {selectedVenda.status || 'N/A'}</p>
-                            </div>
-                        <p><strong>Nome do Cliente:</strong> {selectedVenda.cliente?.nome || 'N/A'}</p>
-                        <p><strong>Nome do Vendedor:</strong> {selectedVenda.vendedor?.nome || 'N/A'}</p>
-                        <p><strong>Vencimento para:</strong> {selectedVenda.vencimento || 'N/A'}</p>
-                        <p><strong>Valor Total:</strong> {selectedVenda.total || 'N/A'}</p>
-                        <p><strong>Desconto:</strong> {selectedVenda.desconto || 'N/A'}</p>
-                        <h3 className="text-lg font-semibold">Itens:</h3>
-                        <ul>
-                            {selectedVenda.produtos.length > 0 ? (
-                                selectedVenda.produtos.map(({ produto, quantidade, precoUnitario, total }, index) => (
-                                    <li key={index}>
-                                        {produto?.nome || 'N/A'} <br /> <b>Quantidade:</b> {quantidade || 'N/A'} - <b>Preço Unitário:</b> {precoUnitario || 'N/A'} <br/> <b className=''>Total: {total || 'N/A'}</b>
+                        <div className='flex justify-between items-center'>
+                            <p><strong>Data:</strong> {selectedVenda.createdAt}</p>
+                            <p><strong>Cliente:</strong> {selectedVenda.cliente.nome}</p>
+                        </div>
+                        <div className='flex justify-between items-center mt-4'>
+                            <p><strong>Vendedor:</strong> {selectedVenda.vendedor.nome}</p>
+                            <p><strong>Total:</strong> {selectedVenda.total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
+                        </div>
+                        <div className='mt-4'>
+                            <h3 className="text-lg font-bold">Produtos</h3>
+                            <ul>
+                                {selectedVenda.produtos.map((produto, index) => (
+                                    <li key={index} className="mt-2">
+                                        {produto.produto.nome} - {produto.quantidade} un. (R$ {produto.total})
                                     </li>
-                                ))
-                            ) : (
-                                <li>N/A</li>
-                            )}
-                        </ul>
-                        <b className='text-base tracking-tighter text-red-600'>Total Geral: {selectedVenda.total || 'N/A'}</b>
-                        <div>
+                                ))}
+                            </ul>
+                        </div>
+                        <div className="mt-6 flex justify-end">
                             <button
                                 onClick={handleDeleteVenda}
-                                className="bg-red-500 text-white p-2 rounded mt-4"
+                                className="bg-red-500 text-white p-2 rounded mr-2"
                                 disabled={deleting}
                             >
-                                {deleting ? (
-                                    <span className="flex items-center">
-                                        <Loader2 className="w-4 h-4 animate-spin" />
-                                    </span>
-                                ) : (
-                                    'Deletar'
-                                )}
+                                {deleting ? 'Excluindo...' : 'Excluir Venda'}
+                            </button>
+                            <button onClick={handleCloseModal} className="bg-gray-500 text-white p-2 rounded">
+                                Fechar
                             </button>
                         </div>
-                        <button
-                            onClick={handleCloseModal}
-                            className="bg-gray-500 text-white p-2 rounded mt-4"
-                        >
-                            Fechar
-                        </button>
                     </div>
                 </div>
             )}
         </div>
     );
-};
+}
 
 export default Vendas;

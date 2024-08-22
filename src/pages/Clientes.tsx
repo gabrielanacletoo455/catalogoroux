@@ -4,7 +4,7 @@ import Execel from '@/assets/xlxs.png';
 //import PDF from '@/assets/pdf.png';
 import Lista from '@/assets/lista-de-tarefas.png';
 import Saldo from '@/assets/divida.png';
-import Logo from '@/assets/logo.jpeg'
+import Logo from '@/assets/banner.jpeg';
 import { useState } from 'react';
 import Adicionar from '@/assets/cliente.png'
 import InfoClient from '@/assets/infocliente.png';
