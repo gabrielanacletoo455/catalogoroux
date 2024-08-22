@@ -23,6 +23,7 @@ import ListaDespesas from './pages/subPages/ListaDespesas'
 import Carrinho from './pages/Carrinho'
 import ProdutoDetalhe from './pages/subPages/ProdutoDetalhe'
 import Pesquisa from './pages/Pesquisa'
+import Pedidos from './pages/Pedidos'
 
 
 const router = createBrowserRouter([
@@ -31,6 +32,9 @@ const router = createBrowserRouter([
   { path: '/produto/:id', element: <ProdutoDetalhe />}, 
 
   { path: '/clientes', element: <Clientes />},
+  { path: '/pedidos', element: <Pedidos />},
+
+  
   
   { path: '/fornecedores', element: <Fornecedores />},
   

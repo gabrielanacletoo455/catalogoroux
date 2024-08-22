@@ -8,12 +8,20 @@ import { AtualizarProduto, GetProdutos } from '@/services/Produtos';
 import * as XLSX from 'xlsx';
 import Execel from '@/assets/xlxs.png';
 import { Input } from '@/components/ui/input';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select"
 
 const Vendas = () => {
     const [loading, setLoading] = useState(false);
     const [vendas, setVendas] = useState<VendasType[]>([]);
     const [filteredVendas, setFilteredVendas] = useState<VendasType[]>([]);
     const [selectedDate, setSelectedDate] = useState('');
+    const [selectedStatus, setSelectedStatus] = useState<'todos' | 'pendente' | 'finalizada'>('todos');
     const [selectedVenda, setSelectedVenda] = useState<VendasType | null>(null);
     const [deleting, setDeleting] = useState(false);
 
@@ -28,6 +36,10 @@ const Vendas = () => {
     const handleVencimentoChange = (e: { target: { value: string; }; }) => {
         const formattedDate = formatarData(e.target.value);
         setSelectedDate(formattedDate);
+    };
+
+    const handleStatusChange = (value: 'todos' | 'pendente' | 'finalizada') => {
+        setSelectedStatus(value);
     };
 
     const fetchVendas = async () => {
@@ -52,15 +64,19 @@ const Vendas = () => {
     }, []);
 
     useEffect(() => {
-        if (selectedDate.trim() === '') {
-            setFilteredVendas(vendas);
-        } else {
-            const filtered = vendas.filter(venda => 
+        let filtered = vendas;
+        if (selectedDate.trim() !== '') {
+            filtered = filtered.filter(venda => 
                 venda.createdAt && venda.createdAt.includes(selectedDate)
             );
-            setFilteredVendas(filtered);
         }
-    }, [selectedDate, vendas]);
+        if (selectedStatus !== 'todos') {
+            filtered = filtered.filter(venda => 
+                venda.status === selectedStatus
+            );
+        }
+        setFilteredVendas(filtered);
+    }, [selectedDate, selectedStatus, vendas]);
 
     const handleVendaClick = (venda: VendasType) => {
         setSelectedVenda(venda);
@@ -150,23 +166,35 @@ const Vendas = () => {
                 <img src={Logo} className='pb-1' alt="Logo" />
             </Link>
 
-            <div className='flex items-center justify-between w-[100%] p-2'>
-                <button onClick={generateExcel} className="text-center flex flex-col items-center">
-                    <img src={Execel} className='w-6 h-6' />
-                    <span className="mt-2 text-sm tracking-tighter">Gerar lista Excel</span>
-                </button>
-
+            <div className='flex items-center p-2 justify-between '>
                 <div className='flex flex-col'>
                     <span>Filtrar por data</span>
                     <Input 
                         type="text" 
                         value={selectedDate} 
                         onChange={handleVencimentoChange} 
-                        placeholder="dd/mm/yyyy"
-                        className="ml-2 p-1 border border-gray-300 rounded-md"
-                        maxLength={10} // Limita o input a 10 caracteres (dd/mm/yyyy)
-                    />
+                        placeholder="DD/MM/YYYY"
+                        className="p-1 border border-gray-300 rounded-md w-24"
+                        maxLength={10} />
                 </div>
+
+                <div className='flex flex-col'>
+                    <span>Filtrar por status</span>
+                    <Select value={selectedStatus} onValueChange={handleStatusChange}>
+                        <SelectTrigger className="w-[180px]">
+                            <SelectValue placeholder="Status" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="todos">Todos</SelectItem>
+                            <SelectItem value="pendente">Pendente</SelectItem>
+                            <SelectItem value="finalizada">Finalizada</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+
+                <button onClick={generateExcel} className="text-center flex flex-col items-center">
+                    <img src={Execel} className='w-8 h-8 mt-3' />
+                </button>
             </div>
 
             {filteredVendas.length === 0 ? (
@@ -177,7 +205,7 @@ const Vendas = () => {
                         <tr>
                             <th className="border p-2">Data</th>
                             <th className="border p-2">Nome do Cliente</th>
-                            <th className="border p-2">Valor Total</th>
+                            <th className="border p-2">Status</th>
                             <th className="border p-2">Ações</th>
                         </tr>
                     </thead>
@@ -186,7 +214,7 @@ const Vendas = () => {
                             <tr key={venda.id}>
                                 <td className="border p-2">{venda.createdAt}</td>
                                 <td className="border p-2">{venda.cliente?.nome || 'N/A'}</td>
-                                <td className="border p-2">{venda.total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }) || 'N/A'}</td>
+                                <td className="border p-2 "> <span className={`${ venda.status === 'finalizada' ? 'text-green-500 font-bold' : 'text-red-500 font-bold'}`}>{venda.status}</span></td>
                                 <td className="border p-2">
                                     <button
                                         onClick={() => handleVendaClick(venda)}
@@ -201,45 +229,62 @@ const Vendas = () => {
                 </table>
             )}
 
-            {selectedVenda && (
-                <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
-                    <div className="bg-white p-4 rounded w-3/4 max-w-3xl">
-                        <h2 className="text-xl font-bold">Detalhes da Venda</h2>
-                        <div className='flex justify-between items-center'>
-                            <p><strong>Data:</strong> {selectedVenda.createdAt}</p>
-                            <p><strong>Cliente:</strong> {selectedVenda.cliente.nome}</p>
-                        </div>
-                        <div className='flex justify-between items-center mt-4'>
-                            <p><strong>Vendedor:</strong> {selectedVenda.vendedor.nome}</p>
-                            <p><strong>Total:</strong> {selectedVenda.total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
-                        </div>
-                        <div className='mt-4'>
-                            <h3 className="text-lg font-bold">Produtos</h3>
-                            <ul>
-                                {selectedVenda.produtos.map((produto, index) => (
-                                    <li key={index} className="mt-2">
-                                        {produto.produto.nome} - {produto.quantidade} un. (R$ {produto.total})
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                        <div className="mt-6 flex justify-end">
-                            <button
-                                onClick={handleDeleteVenda}
-                                className="bg-red-500 text-white p-2 rounded mr-2"
-                                disabled={deleting}
-                            >
-                                {deleting ? 'Excluindo...' : 'Excluir Venda'}
-                            </button>
-                            <button onClick={handleCloseModal} className="bg-gray-500 text-white p-2 rounded">
-                                Fechar
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+{selectedVenda && (
+    <div className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center">
+        <div className="bg-white p-4 rounded w-3/4 max-w-3xl">
+            <h2 className="text-xl font-bold">Detalhes da Venda</h2>
+            <div className='flex justify-between items-center'>
+                <p><strong>Data:</strong> {selectedVenda.createdAt}</p>
+                <p><strong>Cliente:</strong> {selectedVenda.cliente.nome}</p>
+            </div>
+
+            <div className='flex justify-between items-center mt-2'>
+                <p><strong>Venc.:</strong> {selectedVenda.vencimento}</p>
+                <span className={
+                    selectedVenda.status === 'pendente'
+                        ? 'text-red-500 font-semibold'
+                        : 'font-semibold text-green-500'
+                }>
+                    {selectedVenda.status}
+                </span>
+            </div>
+
+            <div className='flex justify-between items-center mt-1'>
+                <p><strong>Vendedor:</strong> {selectedVenda.vendedor.nome}</p>
+                <p className='text-lg'><strong>Total:</strong> {selectedVenda.total.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</p>
+            </div>
+
+            <div className='mt-4'>
+                <h3 className="text-xs font-bold">Produtos</h3>
+                <ul>
+                    {selectedVenda.produtos.map((produto, index) => (
+                        <li key={index} className="mt-2">
+                            <hr />
+                            {produto.produto.nome} - {produto.quantidade} un. (R$ {produto.total})
+                            <hr />
+                        </li>
+                    ))}
+                </ul>
+            </div>
+
+            <div className="mt-6 flex justify-end">
+                <button
+                    onClick={handleDeleteVenda}
+                    className="bg-red-500 text-white p-2 rounded mr-2"
+                    disabled={deleting}
+                >
+                    {deleting ? 'Excluindo...' : 'Excluir Venda'}
+                </button>
+                <button onClick={handleCloseModal} className="bg-gray-500 text-white p-2 rounded">
+                    Fechar
+                </button>
+            </div>
+        </div>
+    </div>
+)}
+
         </div>
     );
-}
+};
 
 export default Vendas;

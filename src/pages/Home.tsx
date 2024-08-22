@@ -9,6 +9,7 @@ import Despesas from '@/assets/despesas.png';
 import Vendas from '@/assets/pos-terminal.png';
 import Catalogo from '@/assets/lendo-um-livro.png';
 import Informacoes from '@/assets/definicoes.png';
+import Presente from '@/assets/presente.png';
 import Logo from '@/assets/banner.jpeg';
 import { PlusCircle } from 'lucide-react';
 
@@ -28,7 +29,7 @@ const menuItems: MenuItem[] = [
   { icon: Vendas, label: 'Vendas', link: '/vendas' },
   { icon: Vendedores, label: 'Vendedores', link: '/vendedores' },
   { icon: Despesas, label: 'Despesas', link: '/despesas' },
-  // { icon: Estoque, label: 'Vendas', link: '/estoque' },
+  { icon: Presente, label: 'Pedidos', link: '/pedidos' },
   { icon: Informacoes, label: 'Informações', link: '/informacoes' },
 ];
 
