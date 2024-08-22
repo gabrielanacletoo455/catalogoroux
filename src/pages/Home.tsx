@@ -39,25 +39,26 @@ const Home = () => {
         <img src={Logo} alt="Logo" className="mx-auto md:w-32 w-full" />
       </header>
       <main className="flex-grow p-4">
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 text-center">
-          {menuItems.map((item, index) => (
-            <Link to={item.link} key={index} className="flex flex-col items-center justify-center p-2">
-              {typeof item.icon === 'string' ? (
-                <img src={item.icon} alt={item.label} className="w-9 h-9 sm:w-16 sm:h-16" />
-              ) : (
-                <item.icon size={32} className="sm:w-16 sm:h-16" />
-              )}
-              <span className="mt-2 text-sm sm:text-base">{item.label}</span>
-            </Link>
-          ))}
-          <div className="flex flex-col items-center justify-center p-2">
-            <img src={Catalogo} alt="Catálogo" className='w-16' />
-            <Link to="/catalogo" target="_blank" rel="noopener noreferrer" className="flex items-center space-x-2 mt-2">
-              <span className='underline text-blue-600 text-sm sm:text-base'>Catálogo</span>
-            </Link>
-          </div>
-        </div>
-      </main>
+  <div className="grid grid-cols-3 gap-4 text-center">
+    {menuItems.map((item, index) => (
+      <Link to={item.link} key={index} className="flex flex-col items-center justify-center p-2">
+        {typeof item.icon === 'string' ? (
+          <img src={item.icon} alt={item.label} className="w-9 h-9 sm:w-16 sm:h-16" />
+        ) : (
+          <item.icon size={32} className="sm:w-16 sm:h-16" />
+        )}
+        <span className="mt-2 text-sm sm:text-base">{item.label}</span>
+      </Link>
+    ))}
+    <div className="flex flex-col items-center justify-center p-2">
+      <img src={Catalogo} alt="Catálogo" className="w-11 h-11" />
+      <Link to="/catalogo" target="_blank" rel="noopener noreferrer" className="flex items-center space-x-2 mt-2">
+        <span className="underline text-blue-600 text-sm sm:text-base">Catálogo</span>
+      </Link>
+    </div>
+  </div>
+</main>
+
       <footer className="bg-red-700 text-white p-4 w-full fixed bottom-0 flex items-center justify-center space-x-2">
         <Link to="/novavenda" className="flex items-center">
           <PlusCircle size={20} />

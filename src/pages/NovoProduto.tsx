@@ -32,7 +32,7 @@ const NovoProduto: React.FC = () => {
     const [novoFornecedor, setNovoFornecedor] = useState('');
     
     const [quantidade, setQuantidade] = useState('');
-    const [informacoesAdicionais, setInformacoesAdicionais] = useState('');
+    // const [informacoesAdicionais, setInformacoesAdicionais] = useState('');
     const [imagens, setImagens] = useState<File[]>([]);
     const [imagensURLs, setImagensURLs] = useState<{ file: File; url: string; loading: boolean }[]>([]);
     const [etapa, setEtapa] = useState(1);
@@ -137,7 +137,7 @@ const calcularLucro = (preco: string, custo: string) => {
                     custo: custo, // Certifique-se de que está correto
                     preco: preco, // Certifique-se de que está correto
                     quantidade: parseInt(quantidade, 10), // Converta para número
-                    informacoes: informacoesAdicionais,
+                    // informacoes: informacoesAdicionais,
                     createdAt: new Date().toLocaleDateString('pt-BR'),
                     updatedAt: null, // Adicione se necessário
                     imagens: imageURLs, // Adicione aqui

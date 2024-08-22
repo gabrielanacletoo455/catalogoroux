@@ -7,7 +7,7 @@ export interface ProdutoEstoque {
     preco: string;
     descricao?: string;
     quantidade: number;
-    informacoes: string;
+    informacoes?: string;
     createdAt: string | null;
     updatedAt?: string | null;
     imagens: string[]; // Adicione este campo
