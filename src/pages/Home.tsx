@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import Clientes from '@/assets/equipe.png';
 import Fornecedores from '@/assets/fornecedor.png';
 import Estoque from '@/assets/caixa.png';
-import Receber from '@/assets/lupa.png';
+//import Receber from '@/assets/lupa.png';
 import Categorias from '@/assets/etiqueta-de-preco.png';
 import Vendedores from '@/assets/vendedor.png';
 import Despesas from '@/assets/despesas.png';
@@ -25,7 +25,7 @@ const menuItems: MenuItem[] = [
   { icon: Fornecedores, label: 'Fornecedores', link: '/fornecedores' },
   { icon: Estoque, label: 'Produtos', link: '/produtos' },
   { icon: Categorias, label: 'Categorias', link: '/categorias' },
-  { icon: Receber, label: 'Pesquisar preço', link: '/pesquisa' },
+ // { icon: Receber, label: 'Pesquisar preço', link: '/pesquisa' },
   { icon: Vendas, label: 'Vendas', link: '/vendas' },
   { icon: Vendedores, label: 'Vendedores', link: '/vendedores' },
   { icon: Despesas, label: 'Despesas', link: '/despesas' },
