@@ -6,7 +6,26 @@ import { Link } from 'react-router-dom';
 
 
 const Pedidos = () => {
-    // const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [produtos, setProdutos] = useState<ProdutoEstoque[]>([]);
+
+    const fetchProdutos = async () => {
+        try {
+            setLoading(true);
+            const data = await GetProdutos();
+            if (data && data.items) {
+                setProdutos(data.items);
+            }
+        } catch (error) {
+            console.error('Erro ao buscar produtos:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchProdutos();
+    }, []);
 
 
 

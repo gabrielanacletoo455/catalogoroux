@@ -73,9 +73,9 @@ const scrapeData = async (query: string): Promise<Product[]> => {
   return allProducts;
 };
 
-// Chamada de exemplo
-scrapeData('Agua Micelar Melu').then(products => {
-  console.log(JSON.stringify(products, null, 2));
-});
+// // Chamada de exemplo
+// scrapeData('Agua Micelar Melu').then(products => {
+//   console.log(JSON.stringify(products, null, 2));
+// });
 
 export default scrapeData;
