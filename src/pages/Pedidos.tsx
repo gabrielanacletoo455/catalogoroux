@@ -3,7 +3,7 @@ import { Loader2 } from 'lucide-react';
 import Logo from '@/assets/banner.jpeg';
 import { Link } from 'react-router-dom';
 import { PedidosType } from '@/@types/Pedidos';
-import { GetPedidos, CriarPedido, AtualizarPedido, ExcluirPedido } from '@/services/Pedidos';
+import { GetPedidos, CriarPedido, AtualizarPedido } from '@/services/Pedidos';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -18,7 +18,7 @@ const Pedidos = () => {
     const [editingId, setEditingId] = useState<string | null>(null);
     const [show, setShow] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
-    const [selectedPedido, setSelectedPedido] = useState<PedidosType | null>(null);
+    const [_selectedPedido, setSelectedPedido] = useState<PedidosType | null>(null);
 
     useEffect(() => {
         fetchPedidos();
@@ -57,12 +57,12 @@ const Pedidos = () => {
         }
     };
 
-    const handleDelete = async (id: string) => {
-        const result = await ExcluirPedido(id);
-        if (result && result.status === 200) {
-            setPedidos(prev => prev.filter(p => p.id !== id));
-        }
-    };
+    // const handleDelete = async (id: string) => {
+    //     const result = await ExcluirPedido(id);
+    //     if (result && result.status === 200) {
+    //         setPedidos(prev => prev.filter(p => p.id !== id));
+    //     }
+    // };
 
     const handleEditClick = (pedido: PedidosType) => {
         setSelectedPedido(pedido);
