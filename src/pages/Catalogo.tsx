@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState  } from 'react';
 import Logo from '@/assets/banner.jpeg';
 import { ProdutoEstoque } from '@/@types/Produtos';
 import { GetProdutos } from '@/services/Produtos';
@@ -6,8 +6,9 @@ import { ShoppingCart, Loader2, X } from 'lucide-react'; // Importa o ícone X p
 import { GetCategorias } from '@/services/Categorias';
 import { CategoriasType } from '@/@types/Categorias';
 import { Button } from '@/components/ui/button';
+import IconeCarrinho from '@/assets/sacola.png';
 
-import IconeCarrinho from '@/assets/sacolas-de-compras.png';
+
 const Catalogo: React.FC = () => {
     const [produtos, setProdutos] = useState<ProdutoEstoque[]>([]);
     const [categorias, setCategorias] = useState<CategoriasType[]>([]);
@@ -16,6 +17,8 @@ const Catalogo: React.FC = () => {
     const [categoriaSelecionada, setCategoriaSelecionada] = useState<string>('');
     const [carrinho, setCarrinho] = useState<{ produto: ProdutoEstoque; quantidade: number }[]>([]);
     const [carrinhoVisivel, setCarrinhoVisivel] = useState<boolean>(false);
+    const [imagemModal, setImagemModal] = useState<string | null>(null);
+    const [imagemIndex, setImagemIndex] = useState<number>(0); // Para controlar qual imagem está sendo exibida
 
     useEffect(() => {
         const fetchProdutos = async () => {
@@ -51,6 +54,39 @@ const Catalogo: React.FC = () => {
         fetchProdutos();
         fetchCategorias();
     }, []);
+
+    const abrirModalImagem = (imagem: string) => {
+        setImagemModal(imagem);
+    };
+
+    const fecharModalImagem = () => {
+        setImagemModal(null);
+    };
+
+    const proximaImagem = (e: React.MouseEvent) => {
+        e.stopPropagation(); // Impede o clique de fechar o modal
+        if (imagemModal) {
+            const produto = produtos.find(produto => produto.imagens.includes(imagemModal));
+            if (produto) {
+                const proximoIndex = (imagemIndex + 1) % produto.imagens.length;
+                setImagemModal(produto.imagens[proximoIndex]);
+                setImagemIndex(proximoIndex);
+            }
+        }
+    };
+    
+    const imagemAnterior = (e: React.MouseEvent) => {
+        e.stopPropagation(); // Impede o clique de fechar o modal
+        if (imagemModal) {
+            const produto = produtos.find(produto => produto.imagens.includes(imagemModal));
+            if (produto) {
+                const anteriorIndex = (imagemIndex - 1 + produto.imagens.length) % produto.imagens.length;
+                setImagemModal(produto.imagens[anteriorIndex]);
+                setImagemIndex(anteriorIndex);
+            }
+        }
+    };
+    
 
     const adicionarAoCarrinho = (produto: ProdutoEstoque) => {
         setCarrinho((prevCarrinho) => {
@@ -163,18 +199,23 @@ const Catalogo: React.FC = () => {
 
                         return (
 
-                            <div key={produto.id} className="border rounded-lg p-4 shadow-md tracking-tighter">
-                                <div className='flex w-full items-center justify-center'>
+                            <div key={produto.id} className="border rounded-lg p-1 py-5 shadow-md tracking-tighter">
+                                <div className='flex w-full items-center justify-center '>
                                     <div className='flex w-[95%] overflow-x-auto '>
                                         {produto.imagens.map((imagem) => (
-                                            <img src={imagem} className='w-24 h-24 mr-3 object-contain' />
+                                                <img
+                                                key={imagem}
+                                                src={imagem}
+                                                className='w-24 h-24 mr-3 object-contain cursor-pointer'
+                                                onClick={() => abrirModalImagem(imagem)} // Abre o modal
+                                            />
                                         ))}
                                     </div>
                                 </div>
                                 <h3 className="text-sm font-bold truncate">{produto.nome}</h3>
                                 <p className="text-lg font-semibold">{produto.preco}</p>
                                 <button
-                                    className="flex items-center space-x-2 bg-green-500 text-white px-3 py-1 rounded-md mt-2 hover:bg-green-600"
+                                    className="flex items-center bg-red-500 text-white px-5 py-3 rounded-md mt-2 hover:bg-red-600"
                                     onClick={() => adicionarAoCarrinho(produto)}>
                                     <ShoppingCart size={20} />
                                     <span className='text-xs'>Adicionar ao Carrinho</span>
@@ -184,10 +225,42 @@ const Catalogo: React.FC = () => {
                     })}
             </div>
 
+
+
+             {/* Modal de Zoom de Imagem */}
+            {imagemModal && (
+                <div
+                    className="fixed inset-0 p-5 bg-black bg-opacity-75 flex items-center justify-center z-50"
+                    onClick={fecharModalImagem}>
+                    <div className="relative">
+                        <button
+                            className="absolute left-4 top-1/2 transform -translate-y-1/2"
+                            onClick={imagemAnterior}
+                        >
+                            &#10094; {/* Ícone de seta para esquerda */}
+                        </button>
+                        <img
+                            src={imagemModal}
+                            className="max-w-full max-h-full object-contain cursor-pointer"
+                            onClick={(e) => e.stopPropagation()} // Impede o clique na imagem de fechar o modal
+                        />
+                        <button
+                            className="absolute right-4 top-1/2 transform -translate-y-1/2"
+                            onClick={proximaImagem}
+                        >
+                            &#10095; {/* Ícone de seta para direita */}
+                        </button>
+                    </div>
+                </div>
+            )}
+
+
+
+                {/* carrinho */}
             <div className="fixed bottom-10 right-0 flex flex-col space-y-4 m-4">
                 <a
                     onClick={toggleCarrinhoVisivel}
-                    className="bg-white p-3 rounded-full shadow-lg hover:bg-gray-200 relative flex items-center justify-center">
+                    className="bg-white p-1 rounded-full shadow-lg hover:bg-gray-200 relative flex items-center justify-center">
                     {/* <ShoppingCart size={32} /> */}
                     <img src={IconeCarrinho} className='w-11' />
                     {carrinho.length > 0 && (
