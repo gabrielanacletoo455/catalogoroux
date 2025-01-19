@@ -8,7 +8,7 @@ import { SenhasType } from "@/@types/Senhas"
 import { GetSenhas } from "@/services/Senhas"
 import Modal from "@/components/ModalEditarClient"
 import Cards_home from './Cards_Home';
-import * as XLSX from 'xlsx'; 
+// import * as XLSX from 'xlsx'; 
 import axios from 'axios'
 import InfoClient from '@/assets/infocliente.png';
 import { Button } from '@/components/ui/button'
@@ -17,21 +17,21 @@ import Telefones from '@/assets/chamada-telefonica.png';
 import AddCliente from '@/assets/mais.png'
 import IconeXLS from '@/assets/folhas.png'
 
-interface Cliente {
-  id: string;
-  nome: string;
-  apelido: string;
-  cep: string;
-  numero: string;
-  rua: string;
-  bairro: string;
-  cidade: string;
-  complemento: string;
-  celular: string;
-  telfixo: string;
-  email: string;
-  createdAt: string;
-}
+// interface Cliente {
+//   id: string;
+//   nome: string;
+//   apelido: string;
+//   cep: string;
+//   numero: string;
+//   rua: string;
+//   bairro: string;
+//   cidade: string;
+//   complemento: string;
+//   celular: string;
+//   telfixo: string;
+//   email: string;
+//   createdAt: string;
+// }
 
 const formatPhoneNumber = (number: string) => {
   const cleaned = ('' + number).replace(/\D/g, '');
@@ -204,41 +204,41 @@ const handleSave = async () => {
 };
 
 
-const generateExcel = async () => {
-    setLoading(true);
-    try {
-        const response = await GetClientes();
-        if (response && response.items) {
-            const items = response.items as Cliente[];
+// const generateExcel = async () => {
+//     setLoading(true);
+//     try {
+//         const response = await GetClientes();
+//         if (response && response.items) {
+//             const items = response.items as Cliente[];
 
-            const worksheetData = [
-                ['Nome', 'Apelido', 'CEP', 'Número', 'Complemento', 'Bairro', 'Cidade', 'Rua'],
-                ...items.map(cliente => [
-                    cliente.nome,
-                    cliente.apelido,
-                    cliente.cep,
-                    cliente.numero,
-                    cliente.complemento,
-                    cliente.bairro,
-                    cliente.cidade,
-                    cliente.rua,
-                ])
-            ];
+//             const worksheetData = [
+//                 ['Nome', 'Apelido', 'CEP', 'Número', 'Complemento', 'Bairro', 'Cidade', 'Rua'],
+//                 ...items.map(cliente => [
+//                     cliente.nome,
+//                     cliente.apelido,
+//                     cliente.cep,
+//                     cliente.numero,
+//                     cliente.complemento,
+//                     cliente.bairro,
+//                     cliente.cidade,
+//                     cliente.rua,
+//                 ])
+//             ];
 
-            const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, 'Clientes');
+//             const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
+//             const workbook = XLSX.utils.book_new();
+//             XLSX.utils.book_append_sheet(workbook, worksheet, 'Clientes');
 
-            XLSX.writeFile(workbook, 'lista_clientes.xlsx');
-        } else {
-            console.error('Resposta da API inválida ou sem clientes.');
-        }
-    } catch (error) {
-        console.error('Erro ao gerar Excel:', error);
-    } finally {
-        setLoading(false);
-    }
-};
+//             XLSX.writeFile(workbook, 'lista_clientes.xlsx');
+//         } else {
+//             console.error('Resposta da API inválida ou sem clientes.');
+//         }
+//     } catch (error) {
+//         console.error('Erro ao gerar Excel:', error);
+//     } finally {
+//         setLoading(false);
+//     }
+// };
 
 
   return (

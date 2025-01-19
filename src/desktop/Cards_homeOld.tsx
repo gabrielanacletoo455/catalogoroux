@@ -1,7 +1,7 @@
-import { ProdutoEstoque } from "@/@types/Produtos";
-import { GetProdutos } from "@/services/Produtos";
-import { Loader2 } from "lucide-react";
-import { useEffect, useState } from "react";
+// import { ProdutoEstoque } from "@/@types/Produtos";
+// import { GetProdutos } from "@/services/Produtos";
+// import { Loader2 } from "lucide-react";
+// import { useEffect, useState } from "react";
 
 const Cards_home = () => {
 //   const [loading, setLoading] = useState(false);
