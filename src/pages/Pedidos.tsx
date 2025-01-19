@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
-import Logo from '@/assets/banner.jpeg';
+import Logo from '@/assets/banner26.png';
 import { Link } from 'react-router-dom';
 import { PedidosType } from '@/@types/Pedidos';
 import { GetPedidos, CriarPedido, AtualizarPedido } from '@/services/Pedidos';

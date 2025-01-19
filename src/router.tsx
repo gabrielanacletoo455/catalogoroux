@@ -24,6 +24,10 @@ import Carrinho from './pages/Carrinho'
 import ProdutoDetalhe from './pages/subPages/ProdutoDetalhe'
 import Pesquisa from './pages/Pesquisa'
 import Pedidos from './pages/Pedidos'
+import Fornecedores_desktop from './desktop/Fornecedores_desktop'
+import Estoque_desktop from './desktop/Estoque_desktop'
+import Vendas_desktop from './desktop/Vendas_desktop'
+import Clientes_desktop from './desktop/Clientes_desktop'
 
 
 const router = createBrowserRouter([
@@ -32,11 +36,15 @@ const router = createBrowserRouter([
   { path: '/produto/:id', element: <ProdutoDetalhe />}, 
 
   { path: '/clientes', element: <Clientes />},
+  { path: '/clientes_desktop', element: <Clientes_desktop />},
   { path: '/pedidos', element: <Pedidos />},
 
   
   
   { path: '/fornecedores', element: <Fornecedores />},
+  { path: '/fornecedores_desktop', element: <Fornecedores_desktop />},
+
+  
   
   { path: '/produtos', element: <Produtos />},
   { path: '/emalta', element: <ProdutosEmAlta />},
@@ -45,13 +53,14 @@ const router = createBrowserRouter([
 
   
   { path: '/novoproduto', element: <NovoProduto />},
-  { path: '/estoque', element: <Home />},
+  { path: '/estoque', element: <Estoque_desktop />},
   { path: '/categorias', element: <Categorias />},
   
   { path: '/receber', element: <Home />},
   
   { path: '/vendedores', element: <Vendedores />},
   { path: '/vendas', element: <Vendas />},
+  { path: '/vendas_desktop', element: <Vendas_desktop />},
   { path: '/novavenda', element: <NovaVenda />},
   { path: '/carrinho', element: <Carrinho />},
 

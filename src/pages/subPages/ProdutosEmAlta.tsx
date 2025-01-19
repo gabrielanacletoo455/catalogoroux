@@ -1,4 +1,4 @@
-import Logo from '@/assets/logo.jpeg'
+import Logo from '@/assets/banner26.png';
 import { useEffect, useState } from 'react';
 // import pdfMake from 'pdfmake/build/pdfmake';
 // import pdfFonts from 'pdfmake/build/vfs_fonts';

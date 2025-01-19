@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Loader2 } from 'lucide-react';
-import Logo from '@/assets/banner.jpeg';
+import Logo from '@/assets/banner26.png';
 import { Link } from 'react-router-dom';
 import { GetVendas, ExcluirVenda } from '@/services/Vendas';
 import { VendasType } from '@/@types/Vendas';

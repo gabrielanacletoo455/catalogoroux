@@ -1,5 +1,5 @@
 import { Loader2, ShoppingCart } from 'lucide-react';
-import Logo from '@/assets/banner.jpeg';
+import Logo from '@/assets/banner26.png';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Input } from '@/components/ui/input';

@@ -4,8 +4,8 @@ import Execel from '@/assets/xlxs.png';
 //import PDF from '@/assets/pdf.png';
 import Lista from '@/assets/lista-de-tarefas.png';
 import Saldo from '@/assets/divida.png';
-import Logo from '@/assets/banner.jpeg';
-import { useState } from 'react';
+import Logo from '@/assets/banner26.png';
+import { useEffect, useState } from 'react';
 import Adicionar from '@/assets/cliente.png'
 import InfoClient from '@/assets/infocliente.png';
 import Telefones from '@/assets/chamada-telefonica.png';
@@ -18,6 +18,7 @@ import axios from 'axios';
 import { CriarCliente, GetClientes } from '@/services/Clientes';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import Clientes_desktop from '@/desktop/Clientes_desktop';
 //import jsPDF from 'jspdf';
 
 interface Cliente {
@@ -46,6 +47,7 @@ const formatPhoneNumber = (number: string) => {
 };
 
 const Clientes = () => {
+    const [isDesktop, setIsDesktop] = useState(window.innerWidth > 768);
     const [show, setShow] = useState(false);
     const [cliente, setCliente] = useState({
         nome: '',
@@ -148,7 +150,19 @@ const Clientes = () => {
         }
     };
 
-
+    useEffect(() => {
+        const handleResize = () => setIsDesktop(window.innerWidth > 768);
+        window.addEventListener('resize', handleResize);
+    
+        return () => window.removeEventListener('resize', handleResize);
+      }, []);
+    
+      if (isDesktop) {
+        return (
+          <Clientes_desktop />
+        )
+      }
+    
     return (
         <div className="w-full flex flex-col">
             <Link to="/" className='md:hidden'>

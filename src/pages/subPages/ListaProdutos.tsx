@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import Logo from '@/assets/logo.jpeg';
+import Logo from '@/assets/banner26.png';
 import { AtualizarProduto, ExcluirProduto, GetProdutos } from "@/services/Produtos";
 import { ProdutoEstoque } from "@/@types/Produtos";
 import ModalProdutos from "@/components/ModalEditarProduto";

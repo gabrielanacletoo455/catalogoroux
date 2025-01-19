@@ -1,5 +1,5 @@
 import React, { useEffect, useState  } from 'react';
-import Logo from '@/assets/banner.jpeg';
+import Logo from '@/assets/banner26.png';
 import { ProdutoEstoque } from '@/@types/Produtos';
 import { GetProdutos } from '@/services/Produtos';
 import { ShoppingCart, Loader2, X } from 'lucide-react'; // Importa o ícone X para remoção
@@ -175,7 +175,7 @@ const Catalogo: React.FC = () => {
             <img src={Logo} className='pb-1' alt="Logo" />
 
             <div className="flex justify-between p-4 items-">
-                <div className="flex-1 items-center justify-between">
+                <div className="flex-1 items-center justify-between px-1">
                     <select
                         id="categoria"
                         value={categoriaSelecionada}
@@ -199,7 +199,7 @@ const Catalogo: React.FC = () => {
 
                         return (
 
-                            <div key={produto.id} className="border rounded-lg p-1 py-5 shadow-md tracking-tighter">
+                            <div key={produto.id} className="border rounded-lg p-4 shadow-md tracking-tighter">
                                 <div className='flex w-full items-center justify-center '>
                                     <div className='flex w-[95%] overflow-x-auto '>
                                         {produto.imagens.map((imagem) => (
@@ -212,13 +212,13 @@ const Catalogo: React.FC = () => {
                                         ))}
                                     </div>
                                 </div>
-                                <h3 className="text-sm font-bold truncate">{produto.nome}</h3>
+                                <h3 className="text-sm font-bold truncate mt-1 text-slate-600">{produto.nome}</h3>
                                 <p className="text-lg font-semibold">{produto.preco}</p>
                                 <button
-                                    className="flex items-center bg-red-500 text-white px-5 py-3 rounded-md mt-2 hover:bg-red-600"
+                                    className="flex items-center bg-red-500 text-white px-5 py-2 rounded-md mt-2 hover:bg-red-600"
                                     onClick={() => adicionarAoCarrinho(produto)}>
                                     <ShoppingCart size={20} />
-                                    <span className='text-xs'>Adicionar ao Carrinho</span>
+                                    <span className='text-xs mx-1'>Adicionar ao Carrinho</span>
                                 </button>
                             </div>
                         );

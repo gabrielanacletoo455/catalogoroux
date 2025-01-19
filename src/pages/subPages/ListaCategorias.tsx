@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import Logo from '@/assets/logo.jpeg';
+import Logo from '@/assets/banner26.png';
 import { GetCategorias, ExcluirCategoria } from "@/services/Categorias";
 import { CategoriasType } from "@/@types/Categorias";
 import { GetSenhas } from "@/services/Senhas";

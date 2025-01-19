@@ -4,7 +4,7 @@ import { Loader2 } from 'lucide-react';
 //import PDF from '@/assets/pdf.png';
 import Lista from '@/assets/lista-de-tarefas.png';
 // import Saldo from '@/assets/divida.png';
-import Logo from '@/assets/banner.jpeg';
+import Logo from '@/assets/banner26.png';
 import { useState } from 'react';
 import Adicionar from '@/assets/caminhao-bau.png'
 import InfoClient from '@/assets/infocliente.png';

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, ChangeEvent } from 'react';
-import Logo from '@/assets/banner.jpeg';
+import Logo from '@/assets/banner26.png';
 import { Link, useNavigate } from 'react-router-dom';
 import { Loader2 } from 'lucide-react'; // Importando o ícone de loading
 import { ProdutoEstoque } from '@/@types/Produtos';
@@ -11,6 +11,7 @@ import { CriarCategoria, GetCategorias } from '@/services/Categorias'; // Import
 import { CategoriasType } from '@/@types/Categorias';
 import { CriarFornecedor, GetFornecedores } from '@/services/Forncedores';
 import { FornecedorType } from '@/@types/Fornecedor';
+import Cards_home from '@/desktop/Cards_Home';
 
 interface GetCategoriasResponse {
     items: CategoriasType[];
@@ -22,6 +23,7 @@ const NovoProduto: React.FC = () => {
     const [categoria, setCategoria] = useState('');
     const [novaCategoria, setNovaCategoria] = useState('');
 
+    const [isDesktop, setIsDesktop] = useState(window.innerWidth > 768);
 
 
     const [custo, setCusto] = useState('');
@@ -42,6 +44,16 @@ const NovoProduto: React.FC = () => {
     const [categorias, setCategorias] = useState<CategoriasType[]>([]);
     const [loading, setLoading] = useState(false);
 
+
+    useEffect(() => {
+        const handleResize = () => setIsDesktop(window.innerWidth > 768);
+        window.addEventListener('resize', handleResize);
+    
+        return () => window.removeEventListener('resize', handleResize);
+      }, []);
+    
+
+      
     useEffect(() => {
         const fetchCategorias = async () => {
             try {
@@ -176,7 +188,7 @@ const calcularLucro = (preco: string, custo: string) => {
     const precoNum = toNumber(preco);
 
     const lucro = (precoNum - custoNum).toFixed(2);
-    const precoSugerido = (custoNum  / 0.6).toFixed(2);
+    //const precoSugerido = (custoNum * 1.9).toFixed(2);
 
     const handleSaveCategoria = async () => {
         try {
@@ -242,9 +254,13 @@ const calcularLucro = (preco: string, custo: string) => {
 
     return (
         <div className="w-full flex flex-col tracking-tighter">
-            <Link to="/">
-                <img src={Logo} className='pb-1' alt="Logo" />
-            </Link>
+          
+                {isDesktop ? 
+                    <div className=''>
+                        <Cards_home />
+                    </div>
+                :   <Link to="/"><img src={Logo} className='pb-1 ' alt="Logo" /> </Link>}
+           
 
             {etapa === 1 && (
                 <div className='w-[95%] flex flex-col items-center justify-center mx-auto space-y-4'>
@@ -310,7 +326,7 @@ const calcularLucro = (preco: string, custo: string) => {
 
 
                         <span className='mx-1'>Lucro: {formatarPreco(lucro)}</span>
-                        <span>Preço sugerido: {formatarPreco(precoSugerido)} (40%)</span>
+                        {/* <span>Preço sugerido: {formatarPreco(precoSugerido)} (90%)</span> */}
                         </div> 
 
                     {/* <textarea

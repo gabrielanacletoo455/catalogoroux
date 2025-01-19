@@ -2,7 +2,7 @@ import { ClienteType } from "@/@types/Cliente";
 import { GetClientes, AtualizarCliente, ExcluirCliente } from "@/services/Clientes";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import Logo from '@/assets/logo.jpeg';
+import Logo from '@/assets/banner26.png';
 import Modal from "@/components/ModalEditarClient";
 import { SenhasType } from "@/@types/Senhas";
 import { GetSenhas } from "@/services/Senhas";

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import Logo from '@/assets/logo.jpeg';
+import Logo from '@/assets/banner26.png';
 import { GetSenhas } from "@/services/Senhas";
 import { SenhasType } from "@/@types/Senhas";
 import { ExcluirDespesa, GetDespesa } from "@/services/Despesas";

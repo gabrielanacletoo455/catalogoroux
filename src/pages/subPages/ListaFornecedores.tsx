@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import Logo from '@/assets/logo.jpeg';
+import Logo from '@/assets/banner26.png';
 import { AtualizarFornecedor, GetFornecedores } from "@/services/Forncedores";
 import { FornecedorType } from "@/@types/Fornecedor";
 import ModalFornecedores from "@/components/ModalEditarFornecedor";

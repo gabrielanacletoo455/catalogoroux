@@ -1,7 +1,7 @@
 import { Loader2 } from 'lucide-react';
 import Execel from '@/assets/xlxs.png';
 import Lista from '@/assets/estoque.png';
-import Logo from '@/assets/banner.jpeg';
+import Logo from '@/assets/banner26.png';
 import EmAlta from '@/assets/estoque-pronto.png';
 import EmBaixa from '@/assets/fora-de-estoque.png';
 import Medalha from "@/assets/medalha-de-ouro.png";

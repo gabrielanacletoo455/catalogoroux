@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import Logo from '@/assets/logo.jpeg';
+import Logo from '@/assets/banner26.png';
 import { FornecedorType } from "@/@types/Fornecedor";
 import { AtualizarVendedor, ExcluirVendedor, GetVendedores } from "@/services/Vendedores";
 import { VendedorType } from "@/@types/Vendedores";

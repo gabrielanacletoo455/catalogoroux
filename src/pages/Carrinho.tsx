@@ -1,5 +1,5 @@
 //import { Loader2 } from 'lucide-react';
-import Logo from '@/assets/banner.jpeg';
+import Logo from '@/assets/banner26.png';
 //import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
